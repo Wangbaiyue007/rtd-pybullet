@@ -8,7 +8,7 @@ clid = p.connect(p.SHARED_MEMORY)
 
 class KinematicsEnv:
 
-    def __init__(self, urdf_path="./assets/fetch/fetch.urdf", GUI=True, timestep=0.001, useGravity=True):
+    def __init__(self, urdf_path="./assets/fetch/fetch.urdf", GUI=True, timestep=0.001, useGravity=True, useRobot=True):
         # enable GUI or not
         if GUI:
             if (clid < 0): p.connect(p.GUI)
@@ -22,23 +22,26 @@ class KinematicsEnv:
             p.setGravity(0, 0, -9.8)
 
         p.setAdditionalSearchPath(pybullet_data.getDataPath())
-        p.loadURDF('plane.urdf')
+        # p.loadURDF('plane.urdf')
 
-        self.urdf_path = urdf_path
-        self.robotId = p.loadURDF(urdf_path, [0, 0, 0], useFixedBase=True)
-        self.path = [self.urdf_path]
-        self.EnvId = [self.robotId]
-        # create offset so that the base position is the origin
-        # p.resetBasePositionAndOrientation(self.robotId, [0, 0, 0], [0, 0, 0, 1])
+        self.EnvId = []
+        if useRobot:
+            self.robotId = p.loadURDF(urdf_path, [0, 0, 0], useFixedBase=True)
+            self.EnvId = [self.robotId]
+        
+            # create offset so that the base position is the origin
+            # p.resetBasePositionAndOrientation(self.robotId, [0, 0, 0], [0, 0, 0, 1])
 
-        # choose the end effector tool frame as end effector index
-        self.actuation_index = []
-        self.EndEffectorIndex = 17
-        self.numJoints = p.getNumJoints(self.robotId)
+            # choose the end effector tool frame as end effector index
+            self.actuation_index = []
+            self.EndEffectorIndex = 17
+            self.numJoints = p.getNumJoints(self.robotId)
 
-        # set robot joint limits and rest positions
-        self.ll, self.ul, self.jr, self.rp = self.get_joint_limits(self.robotId)
-        self.forwardkinematics(self.rp)
+            # set robot joint limits and rest positions
+            self.ll, self.ul, self.jr, self.rp = self.get_joint_limits(self.robotId)
+            self.forwardkinematics(self.rp)
+
+        self.path = [urdf_path]
 
     def get_joint_limits(self, bodyId: int):
         lowerLimits, upperLimits, jointRanges, restPoses = [], [], [], []
@@ -123,9 +126,27 @@ class KinematicsEnv:
         p.resetBasePositionAndOrientation(objId, objPos, objOriQuat)
     
     def force_static_step(self, jointPos: np.array, objIds: list, objPos: list, objOri: list):
+        """
+        Changing the object position without stepping the environment.
+        """
         self.forwardkinematics(jointPos)
         for i in range(len(objIds)):
             self.set_obj_config(objIds[i], objPos[i], objOri[i])
+
+    def plot_zonotope(self, zonotope: np.array) -> list:
+        """
+        Plot the zonotope in the environment.
+        """
+        idx = []
+        lineIds = []
+        color = np.random.uniform(0, 1, 3)
+        for i in range(np.size(zonotope, 0)):
+            idx.append(i)
+            point1 = zonotope[i]
+            for point2 in np.delete(zonotope, idx, 0):
+                lineId = p.addUserDebugLine(point1, point2, lineColorRGB=color, lineWidth=2)
+                lineIds.append(lineId)
+        return lineIds
 
     def Disconnect(self):
         p.disconnect()

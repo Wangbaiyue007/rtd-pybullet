@@ -1,4 +1,4 @@
-from btKinematicsEnv import KinematicsEnv
+from bullet.btKinematicsEnv import KinematicsEnv
 from pybullet_blender_recorder.pyBulletSimRecorder import PyBulletRecorder
 import numpy as np
 import pybullet as pbt
