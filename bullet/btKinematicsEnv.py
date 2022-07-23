@@ -148,5 +148,21 @@ class KinematicsEnv:
                 lineIds.append(lineId)
         return lineIds
 
+    def create_visual(self, filename):
+        """
+        Create a visual shape using a mesh file.
+        """
+        visualShapeId = p.createVisualShape(shapeType=p.GEOM_MESH,
+                                    fileName=filename,
+                                    rgbaColor=np.append(np.random.uniform(0, 1, 3), 0.8),
+                                    visualFramePosition=[0, 0, 0],
+                                    meshScale=[1, 1, 1])
+        p.createMultiBody(baseMass=1,
+                    baseInertialFramePosition=[0, 0, 0],
+                    baseVisualShapeIndex=visualShapeId,
+                    basePosition=[0, 0, 0],
+                    useMaximalCoordinates=True)
+        return visualShapeId
+
     def Disconnect(self):
         p.disconnect()

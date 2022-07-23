@@ -4,6 +4,7 @@ import numpy as np
 import pybullet as pbt
 import math as m
 import csv
+import os
 
 NumOfZono = 5
 vertices = np.genfromtxt('data/vertices.csv', delimiter=',')
@@ -12,9 +13,14 @@ vertices = np.split(vertices, NumOfZono)
 timestep = 0.002
 fetch_env = KinematicsEnv(timestep=timestep, useRobot=False)
 
-for i in range(NumOfZono):
-    zonotope = vertices[i].reshape(8, 3)
-    fetch_env.plot_zonotope(zonotope)
+mesh_list = os.listdir('./meshes')
+for mesh in mesh_list:
+    if '.obj' in mesh:
+        fetch_env.create_visual('meshes/'+mesh)
+
+# for i in range(NumOfZono):
+#     zonotope = vertices[i].reshape(8, 3)
+#     fetch_env.plot_zonotope(zonotope)
 breakpoint()
 
 # recorder = PyBulletRecorder()
