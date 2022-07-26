@@ -46,7 +46,7 @@ class bulletRtdEnv:
             # set robot joint limits and rest positions
             self.ll, self.ul, self.jr, self.rp = self.get_joint_limits(self.robotId)
 
-        if useTorqueControl:
+        if useTorqueControl and useRobot:
             # Disable the motors for torque control
             p.setJointMotorControlArray(self.robotId, self.actuation_index, p.VELOCITY_CONTROL, forces=np.zeros(len(self.actuation_index))) 
 
