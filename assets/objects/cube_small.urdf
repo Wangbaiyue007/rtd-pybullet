@@ -2,13 +2,14 @@
 <robot name="cube.urdf">
     <link name="baseLink">
         <contact>
-            <lateral_friction value="1.0"/>
+            <lateral_friction value="0.5"/>
             <inertia_scaling value="3.0"/>
         </contact>
         <inertial>
             <origin rpy="0 0 0" xyz="0 0 0"/>
-            <mass value=".1"/>
-            <inertia ixx="1" ixy="0" ixz="0" iyy="1" iyz="0" izz="1"/>
+            <mass value=".25"/>
+            <!-- <inertia ixx="1" ixy="0" ixz="0" iyy="1" iyz="0" izz="1"/>-->
+            <inertia ixx="0.00030578" ixy="0.0" ixz="0.0" iyy="0.00030578" iyz="0.0" izz="0.00018145" /> 
         </inertial>
         <visual>
             <origin rpy="0 0 0" xyz="0 0 0"/>

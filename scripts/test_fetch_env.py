@@ -1,11 +1,11 @@
-from bullet.btKinematicsEnv import KinematicsEnv
+from bullet.bulletRtdEnv import bulletRtdEnv
 from pybullet_blender_recorder.pyBulletSimRecorder import PyBulletRecorder
 import numpy as np
 import pybullet as p
 import math as m
 
 timestep = 0.002
-fetch_env = KinematicsEnv(timestep=timestep, useGravity=True)
+fetch_env = bulletRtdEnv(timestep=timestep, useGravity=True)
 legoId, legoPath = fetch_env.load('./assets/objects/lego.urdf', [1, 0, 2])
 tableId, tablePath = fetch_env.load('./assets/table/table.urdf', [1, 0, 0], [0, 0, m.pi/2])
 cubeId, cubePath = fetch_env.load('./assets/objects/cube_small.urdf', [1, 0.5, 2])

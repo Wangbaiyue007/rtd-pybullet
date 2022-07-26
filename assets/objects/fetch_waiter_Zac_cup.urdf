@@ -1,0 +1,28 @@
+<robot name="fetch_waiter_Zac">
+
+  <link name="cup_link">
+    <inertial>
+      <origin rpy="0 0 0" xyz="0 0 0.0508" />
+      <mass value="0.25" />
+      <inertia ixx="0.00030578" ixy="0.0" ixz="0.0" iyy="0.00030578" iyz="0.0" izz="0.00018145" />
+    </inertial>
+    <visual>
+      <origin rpy="0 0 0" xyz="0 0 0" />
+      <geometry>
+        <mesh filename="fetch_description/meshes/Cylinder_metric_scaled_shiftedplanar.STL" />
+          <!-- scale="0.001 0.001 0.001" -->
+      </geometry>
+      <material name="">
+        <color rgba="1 1 1 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin rpy="0 0 0" xyz="0 0 0" />
+      <geometry>
+        <mesh filename="fetch_description/meshes/Cylinder_metric_scaled_shiftedplanar.STL" />
+          <!-- scale="0.001 0.001 0.001" -->
+      </geometry>
+    </collision>
+  </link>
+
+</robot>
