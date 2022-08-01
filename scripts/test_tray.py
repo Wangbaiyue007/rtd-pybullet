@@ -8,7 +8,7 @@ import time
 
 timestep = 0.001
 fetch_env = bulletRtdEnv(urdf_path="../assets/fetch/fetch_waiter.urdf", timestep=timestep, useGravity=True, useRobot=True)
-fetch_env.load("../assets/objects/cube_small.urdf", [1.25, 0, 0.12])
+fetch_env.load("../assets/objects/cube_small.urdf", [1.2479, 0, 0.12]) # center of the tray
 joint_pos = np.genfromtxt('../data/ARMTD_Force_Debug_v4.csv', delimiter=',')
 joint_acc = np.genfromtxt('../data/ARMTD_Force_Debug_v4_Accelerations.csv', delimiter=',')
 joint_pos = joint_pos.T
@@ -37,8 +37,6 @@ qpos_d = np.zeros((steps, 7))
 qvel_d = np.zeros((steps, 7))
 t = np.zeros(steps)
 for i in range(steps):
-    # fetch_env.forwardkinematics(joint_pos[i])
-    # breakpoint()
     t[i] = i * timestep
 
     # calculate desired trajectory

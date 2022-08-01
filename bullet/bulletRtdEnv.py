@@ -1,4 +1,3 @@
-from email.charset import QP
 from typing import Tuple
 import pybullet as p
 import numpy as np
@@ -13,7 +12,16 @@ for i in range(7):
 
 class bulletRtdEnv:
 
-    def __init__(self, urdf_path="../assets/fetch/fetch.urdf", GUI=True, timestep=0.001, useGravity=True, useRobot=True, useTorqueControl=True):
+    def __init__(
+        self, 
+        urdf_path="../assets/fetch/fetch.urdf", 
+        GUI=True, 
+        timestep=0.001, 
+        useGravity=True, 
+        useRobot=True, 
+        useTorqueControl=True
+        ):
+
         # enable GUI or not
         if GUI:
             if (clid < 0): p.connect(p.GUI)
@@ -218,6 +226,8 @@ class bulletRtdEnv:
                     baseVisualShapeIndex=visualShapeId,
                     basePosition=[0, 0, 0],
                     useMaximalCoordinates=True)
+        self.EnvId.append(visualShapeId)
+        self.path.append(filename)
         return visualShapeId
 
     def Disconnect(self):
