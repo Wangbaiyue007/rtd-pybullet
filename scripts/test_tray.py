@@ -48,7 +48,7 @@ for i in range(steps):
     # inverse dynamics controller
     qpos[i], qvel[i] = fetch_env.get_joint_states()
     torque = fetch_env.inversedynamics(qpos_d[i], qvel_d[i], joint_acc[i//10])
-    print(f"joint torques: {torque}")
+    # print(f"joint torques: {torque}")
     fetch_env.torque_control(torque)
     pbt.stepSimulation()
 

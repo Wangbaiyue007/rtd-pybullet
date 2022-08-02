@@ -69,7 +69,10 @@ class PyBulletRecorder:
         file_name = splitext(basename(urdf_path))[0]
         robot = URDF.load(urdf_path)
         for link in robot.links:
-            link_id = link_id_map[link.name]
+            if link.name != '':
+                link_id = link_id_map[link.name]
+            else:
+                link_id = -1
             if len(link.visuals) > 0:
                 for i, link_visual in enumerate(link.visuals):
                     mesh_scale = [global_scaling,
@@ -93,6 +96,11 @@ class PyBulletRecorder:
                             link_visual.geometry.mesh.filename,
                             mesh_scale=mesh_scale))
 
+    def unregister_object(self, body_id):
+        for link in self.links:
+            if link.body_id == body_id:
+                self.links.remove(link)
+    
     def add_keyframe(self):
         # Ideally, call every p.stepSimulation()
         current_state = {}

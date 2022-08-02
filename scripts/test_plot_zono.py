@@ -8,25 +8,26 @@ import os
 
 NumOfZono = 5
 path = '../zonotope/'
-vertices = np.genfromtxt(path+'/data/vertices.csv', delimiter=',')
-vertices = np.split(vertices, NumOfZono)
+# vertices = np.genfromtxt(path+'/data/vertices.csv', delimiter=',')
+# vertices = np.split(vertices, NumOfZono)
 
 timestep = 0.002
 fetch_env = bulletRtdEnv(timestep=timestep, useRobot=False)
 
-mesh_list = os.listdir(path+'/meshes')
+mesh_list = os.listdir(path+'meshes')
 for mesh in mesh_list:
-    if '.obj' in mesh:
+    if '.obj' in mesh and 'zonomesh' in mesh:
         fetch_env.create_visual('meshes/'+mesh)
 
 # for i in range(NumOfZono):
 #     zonotope = vertices[i].reshape(8, 3)
 #     fetch_env.plot_zonotope(zonotope)
-breakpoint()
 
-# recorder = PyBulletRecorder()
-# for i in range(len(fetch_env.EnvId)):
-#     recorder.register_object(fetch_env.EnvId[i], fetch_env.path[i])
+recorder = PyBulletRecorder()
+for i in range(len(fetch_env.EnvId)):
+    recorder.register_object(fetch_env.EnvId[i], fetch_env.path[i])
+
+breakpoint()
 
 t = 0.0
 t_total = 100

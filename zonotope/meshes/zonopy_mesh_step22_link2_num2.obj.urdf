@@ -1,0 +1,17 @@
+<robot name="zonopy_mesh_step22_link2_num2.obj">
+	<link name="">
+		<visual>
+			<origin xyz="0.03753389791348818 -0.009539327191015107 -0.3498270449478206" rpy="0 0 0" />
+			<geometry>
+				<mesh filename="zonopy_mesh_step22_link2_num2.obj" scale="1.0 1.0 1.0" />
+			</geometry>
+			<material name="texture">
+				<color rgba="1.0 1.0 1.0 1.0" />
+			</material>
+		</visual>
+		<inertial>
+			<mass value="0" />
+			<inertia ixx="0.0" ixy="0.0" ixz="0.0" iyy="0.0" iyz="0.0" izz="0.0" />
+		</inertial>
+	<collision><geometry><mesh filename="zonopy_mesh_step22_link2_num2.obj" /></geometry><origin xyz="0.03753389791348818 -0.009539327191015107 -0.3498270449478206" rpy="0 0 0" /></collision></link>
+</robot>

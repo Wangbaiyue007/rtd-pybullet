@@ -7,7 +7,7 @@ clid = p.connect(p.SHARED_MEMORY)
 Kp = np.eye(7)
 Kd = np.eye(7)
 for i in range(7):
-    Kp[i, i] = 1000*(1-0.15*i)
+    Kp[i, i] = 100*(1-0.15*i)
     Kd[i, i] = 1.3*(Kp[i, i]/2)**0.5
 
 class bulletRtdEnv:
@@ -218,17 +218,22 @@ class bulletRtdEnv:
         """
         visualShapeId = p.createVisualShape(shapeType=p.GEOM_MESH,
                                     fileName=filename,
-                                    rgbaColor=np.append(np.random.uniform(0, 1, 3), 0.8),
+                                    flags=p.GEOM_FORCE_CONCAVE_TRIMESH,
+                                    rgbaColor=[0.2, 0.2, 0.6, 0.2],
                                     visualFramePosition=[0, 0, 0],
                                     meshScale=[1, 1, 1])
-        p.createMultiBody(baseMass=1,
+        Id = p.createMultiBody(baseMass=0,
                     baseInertialFramePosition=[0, 0, 0],
                     baseVisualShapeIndex=visualShapeId,
                     basePosition=[0, 0, 0],
-                    useMaximalCoordinates=True)
-        self.EnvId.append(visualShapeId)
+                    useMaximalCoordinates=False)
+        self.EnvId.append(Id)
         self.path.append(filename)
-        return visualShapeId
+        return Id
+    
+    def remove_body(self, bodyId):
+        p.removeBody(bodyId)
+        # self.EnvId.remove(bodyId)
 
     def Disconnect(self):
         p.disconnect()

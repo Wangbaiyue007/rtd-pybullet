@@ -1,0 +1,17 @@
+<robot name="zonopy_mesh_step7_link7_num4.obj">
+	<link name="">
+		<visual>
+			<origin xyz="0.1275946096582056 0.032667669192983625 -1.1445219976499592" rpy="0 0 0" />
+			<geometry>
+				<mesh filename="zonopy_mesh_step7_link7_num4.obj" scale="1.0 1.0 1.0" />
+			</geometry>
+			<material name="texture">
+				<color rgba="1.0 1.0 1.0 1.0" />
+			</material>
+		</visual>
+		<inertial>
+			<mass value="0" />
+			<inertia ixx="0.0" ixy="0.0" ixz="0.0" iyy="0.0" iyz="0.0" izz="0.0" />
+		</inertial>
+	<collision><geometry><mesh filename="zonopy_mesh_step7_link7_num4.obj" /></geometry><origin xyz="0.1275946096582056 0.032667669192983625 -1.1445219976499592" rpy="0 0 0" /></collision></link>
+</robot>
