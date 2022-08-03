@@ -19,4 +19,4 @@ for file in dir_list:
         convert_mesh(path+file, path+file.replace('.stl', '.obj'))
         
 builder = ObjectUrdfBuilder(path, urdf_prototype='../_prototype.urdf')
-builder.build_library(force_overwrite=True, decompose_concave=False, force_decompose=False, center = 'mass')
+builder.build_library(force_overwrite=True, decompose_concave=False, force_decompose=False, center = None)

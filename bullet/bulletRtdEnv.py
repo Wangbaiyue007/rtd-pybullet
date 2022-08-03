@@ -233,7 +233,7 @@ class bulletRtdEnv:
     
     def remove_body(self, bodyId):
         p.removeBody(bodyId)
-        # self.EnvId.remove(bodyId)
+        self.EnvId.remove(bodyId)
 
     def Disconnect(self):
         p.disconnect()

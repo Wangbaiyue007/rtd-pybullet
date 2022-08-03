@@ -69,10 +69,7 @@ class PyBulletRecorder:
         file_name = splitext(basename(urdf_path))[0]
         robot = URDF.load(urdf_path)
         for link in robot.links:
-            if link.name != '':
-                link_id = link_id_map[link.name]
-            else:
-                link_id = -1
+            link_id = link_id_map[link.name]
             if len(link.visuals) > 0:
                 for i, link_visual in enumerate(link.visuals):
                     mesh_scale = [global_scaling,

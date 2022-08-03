@@ -24,18 +24,21 @@ kinova_env.forwardkinematics(joint_pos[0])
 
 # initialize renderer
 recorder = PyBulletRecorder()
+recorder_zono = PyBulletRecorder()
+# register objects to recorder
 for i in range(len(kinova_env.EnvId)):
     recorder.register_object(kinova_env.EnvId[i], kinova_env.path[i])
 
 qpos = joint_pos[0]
 qvel = np.zeros(7)
 for step in range(num_step):
+
     # create zonotope visual
     zonoIds = []
     for file in files_zono:
         if 'step'+str(step+1)+'_' in file and '.obj' in file and '.urdf' not in file:
             zonoId = kinova_env.create_visual(path_to_zono+file)
-            recorder.register_object(zonoId, path_to_zono+file+'.urdf')
+            recorder_zono.register_object(zonoId, path_to_zono+file+'.urdf')
             zonoIds.append(zonoId)
 
     # control loop
@@ -45,12 +48,19 @@ for step in range(num_step):
         kinova_env.torque_control(torque)
         pbt.stepSimulation()
         time.sleep(timestep)
+        # record the video at 50 fps
+        if t%20 == 0: 
+            recorder.add_keyframe()
+            recorder_zono.add_keyframe()
+
+    # dump recording and reset
+    recorder_zono.save("../data/zonopy/zonopy_step"+str(step+1)+".pkl")
+    recorder_zono.reset()
 
     # remove zonotope visual
     for Id in zonoIds:
         kinova_env.remove_body(Id)
-        recorder.unregister_object(zonoId)
+        recorder_zono.unregister_object(Id)
 
-breakpoint()
-recorder.save("../data/zonopy.pkl")
+recorder.save("../data/zonopy/zonopy_kinova.pkl")
 kinova_env.Disconnect()
