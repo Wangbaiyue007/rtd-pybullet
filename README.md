@@ -1,6 +1,17 @@
 # rtd-pybullet
 Running ARMTD ([Autonomous Reachability-based Manipulator Trajectory Design](https://arxiv.org/abs/2002.01591)) in various platforms and simulate in pybullet, and create rendered animation.
 
+## Examples
+### Kinova obstacle avoidance using ARMTD
+<p align="center">
+    <img src="data/gif/kinova_obstacle_avoidance.gif">
+<p/>
+
+### Fetch carrying objects using ARMTD with force closure
+<p align="center">
+    <img src="data/gif/fetch_force_closure.gif">
+<p/>
+
 ## Instructions
 ### 0. Notes
 - At the root folder, run `pip install -e .` to set up the package.
@@ -25,10 +36,3 @@ With all the `.pkl` files, it is easy to do the rendering by importing them to B
 
 ## TODO:
 Connect with MATLAB version of ARMTD.
-
-## Demo
-### Kinova obstacle avoidance using ARMTD
-![kinova_ice100](data/gif/kinova_obstacle_avoidance.gif)
-
-### Fetch carrying objects using ARMTD with force closure
-![fetch_waiter](data/gif/fetch_force_closure.gif)
