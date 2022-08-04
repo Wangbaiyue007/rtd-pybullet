@@ -1,3 +1,4 @@
 [submodule "zonopy"]
 	path = zonopy
 	url = https://github.com/kwonyos/zonopy
+	branch = bullet
