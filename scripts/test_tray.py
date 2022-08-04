@@ -9,8 +9,8 @@ import time
 timestep = 0.001
 fetch_env = bulletRtdEnv(urdf_path="../assets/fetch/fetch_waiter.urdf", timestep=timestep, useGravity=True, useRobot=True)
 fetch_env.load("../assets/objects/cube_small.urdf", [1.2479, 0, 0.12]) # center of the tray
-joint_pos = np.genfromtxt('../data/ARMTD_Force_Debug_v4.csv', delimiter=',')
-joint_acc = np.genfromtxt('../data/ARMTD_Force_Debug_v4_Accelerations.csv', delimiter=',')
+joint_pos = np.genfromtxt('../data/ARMTD_force/ARMTD_Force_failed_trial_Positions.csv', delimiter=',')
+joint_acc = np.genfromtxt('../data/ARMTD_force/ARMTD_Force_failed_trial_Accelerations.csv', delimiter=',')
 joint_pos = joint_pos.T
 joint_acc = joint_acc.T
 joint_acc = np.concatenate((np.zeros((1,7)), joint_acc), 0)
@@ -70,6 +70,5 @@ plt.plot(t, qvel)
 plt.legend(['vel des'])
 plt.show()
 
-breakpoint()
-recorder.save("../data/tray.pkl")
+recorder.save("../data/pkl/tray.pkl")
 fetch_env.Disconnect()

@@ -11,9 +11,9 @@ import os
 num_step = 30
 timestep = 0.001
 kinova_env = bulletRtdEnv(urdf_path="../assets/kinova_gen3_7dof/kinova_with_robotiq_85.urdf", timestep=timestep, useGravity=True, useRobot=True)
-joint_pos = np.genfromtxt('../zonotope/data/zonopy_qpos.csv', delimiter=',')
-joint_acc = np.genfromtxt('../zonotope/data/zonopy_qacc.csv', delimiter=',')
-obstacle_pos = np.genfromtxt('../zonotope/data/zonopy_obstacles.csv', delimiter=',')
+joint_pos = np.genfromtxt('../data/ARMTD_zonopy/zonopy_qpos.csv', delimiter=',')
+joint_acc = np.genfromtxt('../data/ARMTD_zonopy/zonopy_qacc.csv', delimiter=',')
+obstacle_pos = np.genfromtxt('../data/ARMTD_zonopy/zonopy_obstacles.csv', delimiter=',')
 path_to_zono = '../zonotope/meshes/'
 files_zono = os.listdir(path_to_zono)
 
@@ -54,7 +54,7 @@ for step in range(num_step):
             recorder_zono.add_keyframe()
 
     # dump recording and reset
-    recorder_zono.save("../data/zonopy/zonopy_step"+str(step+1)+".pkl")
+    recorder_zono.save("../data/pkl/zonopy_step"+str(step+1)+".pkl")
     recorder_zono.reset()
 
     # remove zonotope visual
@@ -62,5 +62,5 @@ for step in range(num_step):
         kinova_env.remove_body(Id)
         recorder_zono.unregister_object(Id)
 
-recorder.save("../data/zonopy/zonopy_kinova.pkl")
+recorder.save("../data/pkl/zonopy_kinova.pkl")
 kinova_env.Disconnect()

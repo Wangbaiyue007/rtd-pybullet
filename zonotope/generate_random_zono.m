@@ -26,11 +26,11 @@ for i = 1:NumOfZono
     figure(i); grid on;
 
     % save convex hull as .STL
-    DT = delaunayTriangulation(ver(1, :)', ver(2, :)', ver(3, :)')
+    DT = delaunayTriangulation(ver(1, :)', ver(2, :)', ver(3, :)');
     tetramesh(DT, 'FaceAlpha', 0.3);
     [K,v] = convexHull(DT);
     stlwrite(append('meshes/zonomesh_', num2str(i), '.stl'), K, ver')
 end
 
 % save vertices matrix
-writecell(V, 'data/vertices.csv')
+writecell(V, 'vertices.csv')

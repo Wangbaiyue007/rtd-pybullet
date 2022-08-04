@@ -15,7 +15,7 @@
     <visual>
       <origin xyz="0 0 0" rpy="0 0 0" />
       <geometry>
-        <mesh filename="meshes/base_link.stl" />
+        <mesh filename="meshes/base_link.obj" />
       </geometry>
       <material name="">
         <color rgba="0.75294 0.75294 0.75294 1" />
@@ -37,7 +37,7 @@
     <visual>
       <origin xyz="0 0 0" rpy="0 0 0" />
       <geometry>
-        <mesh filename="meshes/shoulder_link.stl" />
+        <mesh filename="meshes/shoulder_link.obj" />
       </geometry>
       <material name="">
         <color rgba="0.75294 0.75294 0.75294 1" />
@@ -66,7 +66,7 @@
     <visual>
       <origin xyz="0 0 0" rpy="0 0 0" />
       <geometry>
-        <mesh filename="meshes/half_arm_1_link.stl" />
+        <mesh filename="meshes/half_arm_1_link.obj" />
       </geometry>
       <material name="">
         <color rgba="0.75294 0.75294 0.75294 1" />
@@ -95,7 +95,7 @@
     <visual>
       <origin xyz="0 0 0" rpy="0 0 0" />
       <geometry>
-        <mesh filename="meshes/half_arm_2_link.stl" />
+        <mesh filename="meshes/half_arm_2_link.obj" />
       </geometry>
       <material name="">
         <color rgba="0.75294 0.75294 0.75294 1" />
@@ -124,7 +124,7 @@
     <visual>
       <origin xyz="0 0 0" rpy="0 0 0" />
       <geometry>
-        <mesh filename="meshes/forearm_link.stl" />
+        <mesh filename="meshes/forearm_link.obj" />
       </geometry>
       <material name="">
         <color rgba="0.75294 0.75294 0.75294 1" />
@@ -153,7 +153,7 @@
     <visual>
       <origin xyz="0 0 0" rpy="0 0 0" />
       <geometry>
-        <mesh filename="meshes/spherical_wrist_1_link.stl" />
+        <mesh filename="meshes/spherical_wrist_1_link.obj" />
       </geometry>
       <material name="">
         <color rgba="0.75294 0.75294 0.75294 1" />
@@ -182,7 +182,7 @@
     <visual>
       <origin xyz="0 0 0" rpy="0 0 0" />
       <geometry>
-        <mesh filename="meshes/spherical_wrist_2_link.stl" />
+        <mesh filename="meshes/spherical_wrist_2_link.obj" />
       </geometry>
       <material name="">
         <color rgba="0.75294 0.75294 0.75294 1" />
@@ -211,7 +211,7 @@
     <visual>
       <origin xyz="0 0 0" rpy="0 0 0" />
       <geometry>
-        <mesh filename="meshes/bracelet_with_vision_link.stl" />
+        <mesh filename="meshes/bracelet_no_vision_link.obj" />
       </geometry>
       <material name="">
         <color rgba="0.75294 0.75294 0.75294 1" />
@@ -220,7 +220,7 @@
     <collision>
       <origin xyz="0 0 0" rpy="0 0 0" />
       <geometry>
-        <mesh filename="meshes/bracelet_with_vision_link.stl" />
+        <mesh filename="meshes/bracelet_no_vision_link.stl" />
       </geometry>
     </collision>
   </link>

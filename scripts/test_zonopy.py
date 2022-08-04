@@ -29,21 +29,20 @@ for step in range(30):
     print(f"qvel_poststep: {env.qvel}")
 
     if env.safe:
-        print("safe move")
+        print("--safe move--")
         qacc[step] = ka
     else:
-        print("safe break")
+        print("--safe break--")
         qacc[step] = ka_break
     print(f"qacc: {qacc[step]}")
 
     # save reach set to vertices files
     env.render(planner.FO_link)
     for i in range(env.n_links):
-        for j in range(4):
+        for j in range(100):
             filename = "../zonotope/data/zonopy_sim/zonopy_vertices_step"+str(step+1)+"_link"+str(i+1)+"_num"+str(j+1)+".csv"
             FO_poly = env.FO_poly[i][j].numpy()
             FO_poly = FO_poly.transpose(2,1,0).reshape(3,-1).T
-            open(filename, "w")
             np.savetxt(filename, FO_poly, delimiter=",")
     if done: 
         print("Done!")
