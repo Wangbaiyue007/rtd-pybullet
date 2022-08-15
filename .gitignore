@@ -1,4 +1,5 @@
-
+data/ARMTD_matlab/matlab_sim
+data/ARMTD_zonopy/zonopy_sim
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

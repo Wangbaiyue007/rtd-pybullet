@@ -169,12 +169,12 @@ class bulletRtdEnv:
         quat = p.getQuaternionFromEuler(euler)
         return quat
 
-    def load(self, filename: str, pos:list=[0, 0, 0], ori:list=[0, 0, 0]) -> Tuple[int, str]:
+    def load(self, filename: str, pos:list=[0, 0, 0], ori:list=[0, 0, 0], scale:list=[1, 1, 1]) -> Tuple[int, str]:
         """
         Loading an object from URDF. \n
         return: object id.
         """
-        objId = p.loadURDF(filename)
+        objId = p.loadURDF(filename, globalScaling=scale)
         self.EnvId.append(objId)
         self.path.append(filename)
         
@@ -212,7 +212,7 @@ class bulletRtdEnv:
                 lineIds.append(lineId)
         return lineIds
 
-    def create_visual(self, filename):
+    def create_visual(self, filename, scale: list=[1, 1, 1], pos: list=[0, 0, 0]):
         """
         Create a visual shape using a mesh file.
         """
@@ -221,12 +221,13 @@ class bulletRtdEnv:
                                     flags=p.GEOM_FORCE_CONCAVE_TRIMESH,
                                     rgbaColor=[0.2, 0.2, 0.6, 0.2],
                                     visualFramePosition=[0, 0, 0],
-                                    meshScale=[1, 1, 1])
+                                    meshScale=scale)
         Id = p.createMultiBody(baseMass=0,
                     baseInertialFramePosition=[0, 0, 0],
                     baseVisualShapeIndex=visualShapeId,
                     basePosition=[0, 0, 0],
                     useMaximalCoordinates=False)
+        p.resetBasePositionAndOrientation(Id, pos, [0, 0, 0, 1])
         self.EnvId.append(Id)
         self.path.append(filename)
         return Id
