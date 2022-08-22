@@ -1,5 +1,11 @@
 <?xml version="1.0" ?>
 <robot name="fetch_arm">
+    <link name="base" />
+    <joint name="translation" type="fixed">
+        <origin xyz="-0.06525 0 0"/>
+        <parent link="base"/>
+        <child link="base_link"/>
+    </joint>
     <link name="base_link">
         <inertial>
             <origin rpy="0 0 0" xyz="-0.0036 0.0 0.0014" />
@@ -24,6 +30,7 @@
     </link>
     <joint name="torso_lift_joint" type="fixed">
         <origin rpy="-6.123E-17 0 0" xyz="-0.086875 0 0.37743" />
+        <!-- <origin rpy="-6.123E-17 0 0" xyz="-0.152125 0 0.37743" /> -->
         <parent link="base_link" />
         <child link="torso_lift_link" />
         <axis xyz="0 0 1" />
@@ -110,9 +117,9 @@
         <limit effort="0.68" lower="-0.76" upper="1.45" velocity="1.57" />
     </joint>
     <joint name="shoulder_pan_joint" type="revolute">
-        <origin rpy="0 0 0" xyz="0.119525 0 0.34858" />
-        <!-- <origin rpy="0 0 0" xyz="-0.0326 0 0.726" /> -->
-        <parent link="torso_lift_link" />
+        <!-- <origin rpy="0 0 0" xyz="0.119525 0 0.34858" /> -->
+        <origin rpy="0 0 0" xyz="-0.0326 0 0.726" />
+        <parent link="base" />
         <child link="shoulder_pan_link" />
         <axis xyz="0 0 1" />
         <dynamics damping="1.0" />

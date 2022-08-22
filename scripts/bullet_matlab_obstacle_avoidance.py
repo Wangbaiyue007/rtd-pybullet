@@ -8,10 +8,6 @@ import math as m
 import time
 import os
 
-num_step = 26
-timestep = 0.001
-fetch_env = bulletRtdEnv(urdf_path="../assets/fetch/fetch_arm_new_dumbbell.urdf", timestep=timestep, useGravity=True, useRobot=True)
-
 # Joint data
 joint_pos = np.genfromtxt('../data/ARMTD_matlab/joint_pos.csv', delimiter=',').T
 joint_vel = np.genfromtxt('../data/ARMTD_matlab/joint_vel.csv', delimiter=',').T
@@ -30,27 +26,39 @@ for i in range(np.size(obstacle_info, 0)):
 path_to_zono = '../zonotope/meshes_matlab/'
 files_zono = os.listdir(path_to_zono)
 
+# Initialize simulation
+num_step = 27
+timestep = 0.001
+fetch_env = bulletRtdEnv(urdf_path="../assets/fetch/fetch_arm_new_dumbbell.urdf", timestep=timestep, useGravity=True, useRobot=True)
+
 # initialize obstacle positions and robot positions
 for i in range(np.size(obstacle_pos, 0)):
-    fetch_env.create_visual("../assets/objects/cube.obj", scale=obstacle_scale[i], pos=obstacle_pos[i])
+    fetch_env.load("../assets/objects/cube_small_zero.urdf", pos=obstacle_pos[i], scale=0.01)
 fetch_env.forwardkinematics(joint_pos[0])
 
 # initialize renderer
 recorder = PyBulletRecorder()
 recorder_zono = PyBulletRecorder()
-# register objects to recorder
-for i in range(len(fetch_env.EnvId)):
-    recorder.register_object(fetch_env.EnvId[i], fetch_env.path[i])
-    break
+recorder_zono_slc = PyBulletRecorder()
+# register robot
+recorder.register_object(fetch_env.EnvId[0], fetch_env.path[0])
+# register obstacles with correct scale
+for i in range(1, len(fetch_env.EnvId)):
+    recorder.register_object(fetch_env.EnvId[i], fetch_env.path[i], obstacle_scale[i-1])
 
 qpos = joint_pos[0]
 qvel = np.zeros(7)
 for step in range(num_step):
 
     # create zonotope visual
+    zonoIds_slc = []
     zonoIds = []
     for file in files_zono:
         if 'slc_step'+str(step+1)+'_' in file and '.obj' in file and '.urdf' not in file:
+            zonoId_slc = fetch_env.create_visual(path_to_zono+file)
+            recorder_zono_slc.register_object(zonoId_slc, path_to_zono+file+'.urdf')
+            zonoIds_slc.append(zonoId_slc)
+        if 'step'+str(step+1)+'_' in file and '.obj' in file and '.urdf' not in file and 'slc' not in file:
             zonoId = fetch_env.create_visual(path_to_zono+file)
             recorder_zono.register_object(zonoId, path_to_zono+file+'.urdf')
             zonoIds.append(zonoId)
@@ -70,15 +78,20 @@ for step in range(num_step):
         if t%20 == 0: 
             recorder.add_keyframe()
             recorder_zono.add_keyframe()
-    breakpoint()
+
     # dump recording and reset
-    recorder_zono.save("../data/pkl/matlab_step"+str(step+1)+".pkl")
+    recorder_zono.save("../data/pkl/matlab_zono_step"+str(step+1)+".pkl")
+    recorder_zono_slc.save("../data/pkl/matlab_zono_step"+str(step+1)+"_slc.pkl")
     recorder_zono.reset()
+    recorder_zono_slc.reset()
 
     # remove zonotope visual
     for Id in zonoIds:
         fetch_env.remove_body(Id)
         recorder_zono.unregister_object(Id)
+    for Id in zonoIds_slc:
+        fetch_env.remove_body(Id)
+        recorder_zono_slc.unregister_object(Id)
 
 recorder.save("../data/pkl/matlab_fetch.pkl")
 fetch_env.Disconnect()

@@ -169,7 +169,7 @@ class bulletRtdEnv:
         quat = p.getQuaternionFromEuler(euler)
         return quat
 
-    def load(self, filename: str, pos:list=[0, 0, 0], ori:list=[0, 0, 0], scale:list=[1, 1, 1]) -> Tuple[int, str]:
+    def load(self, filename: str, pos: list=[0, 0, 0], ori: list=[0, 0, 0], scale: float=1) -> Tuple[int, str]:
         """
         Loading an object from URDF. \n
         return: object id.
@@ -225,9 +225,9 @@ class bulletRtdEnv:
         Id = p.createMultiBody(baseMass=0,
                     baseInertialFramePosition=[0, 0, 0],
                     baseVisualShapeIndex=visualShapeId,
-                    basePosition=[0, 0, 0],
+                    # baseCollisionShapeIndex=collisionShapeId,
+                    basePosition=pos,
                     useMaximalCoordinates=False)
-        p.resetBasePositionAndOrientation(Id, pos, [0, 0, 0, 1])
         self.EnvId.append(Id)
         self.path.append(filename)
         return Id

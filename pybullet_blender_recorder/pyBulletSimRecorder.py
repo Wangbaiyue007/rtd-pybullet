@@ -57,7 +57,7 @@ class PyBulletRecorder:
         self.states = []
         self.links = []
 
-    def register_object(self, body_id, urdf_path, global_scaling=1):
+    def register_object(self, body_id, urdf_path, global_scaling=[1, 1, 1]):
         link_id_map = dict()
         n = p.getNumJoints(body_id)
         link_id_map[p.getBodyInfo(body_id)[0].decode('gb2312')] = -1
@@ -72,10 +72,9 @@ class PyBulletRecorder:
             link_id = link_id_map[link.name]
             if len(link.visuals) > 0:
                 for i, link_visual in enumerate(link.visuals):
-                    mesh_scale = [global_scaling,
-                                  global_scaling, global_scaling]\
-                        if link_visual.geometry.mesh.scale is None \
-                        else link_visual.geometry.mesh.scale * global_scaling
+                    mesh_scale = global_scaling
+                        # if link_visual.geometry.mesh.scale is None \
+                        # else link_visual.geometry.mesh.scale
                     self.links.append(
                         PyBulletRecorder.LinkTracker(
                             name=file_name + f'_{body_id}_{link.name}_{i}',
@@ -88,7 +87,7 @@ class PyBulletRecorder:
                             (np.linalg.inv(link.inertial.origin)
                              if link_id == -1
                              else np.identity(4)) @
-                            link_visual.origin * global_scaling,
+                            link_visual.origin * global_scaling[0],
                             mesh_path=dir_path + '/' +
                             link_visual.geometry.mesh.filename,
                             mesh_scale=mesh_scale))
