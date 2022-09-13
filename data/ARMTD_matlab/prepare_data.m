@@ -5,8 +5,10 @@ load('test0822.mat');
 %% save joint trajectories
 joint_pos = summary.trajectory([1:2:13], :);
 joint_vel = summary.trajectory([2:2:14], :);
+joint_acc = A.reference_acceleration;
 writematrix(joint_pos, 'joint_pos.csv', 'Delimiter', ',');
 writematrix(joint_vel, 'joint_vel.csv', 'Delimiter', ',');
+writematrix(joint_acc, 'joint_acc.csv', 'Delimiter', ',');
 
 %% save obstacles
 numObstacles = size(summary.obstacles, 2);
@@ -21,8 +23,8 @@ writematrix(Z, 'matlab_obstacles.csv');
 clearvars -except P;
 for iter = 1:27
     for link = 1:9
-        verts_slc_ = [];
-        verts_ = [];
+        verts_slc_ = zeros(3, 100*28);
+        verts_ = zeros(3, 100*28);
         for timestep = 1:100
             % merge all timestep, reduce zonotope
             zono_slc = P.info.sliced_FO_zono{1, iter}{1, timestep}{1, link};
@@ -33,8 +35,8 @@ for iter = 1:27
             % convert to vertices
             ver_slc_ = vertices(zono_slc_);
             ver_ = vertices(zono_);
-            verts_slc_ = [verts_slc_ ver_slc_];
-            verts_ = [verts_ ver_];
+            verts_slc_(:, 28*(timestep-1)+1:28*timestep) = ver_slc_;
+            verts_(:, 28*(timestep-1)+1:28*timestep) = ver_;
         end
         %writematrix(verts_, append('matlab_sim/matlab_vertices_step', ...
         %             num2str(iter), '_link', num2str(link), '.csv'));

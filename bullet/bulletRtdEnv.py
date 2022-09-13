@@ -7,7 +7,7 @@ clid = p.connect(p.SHARED_MEMORY)
 Kp = np.eye(7)
 Kd = np.eye(7)
 for i in range(7):
-    Kp[i, i] = 1000*(1-0.15*i)
+    Kp[i, i] = 100000*(1-0.15*i)
     Kd[i, i] = 1.3*(Kp[i, i]/2)**0.5
 
 class bulletRtdEnv:

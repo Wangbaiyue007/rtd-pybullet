@@ -11,6 +11,7 @@ import os
 # Joint data
 joint_pos = np.genfromtxt('../data/ARMTD_matlab/joint_pos.csv', delimiter=',').T
 joint_vel = np.genfromtxt('../data/ARMTD_matlab/joint_vel.csv', delimiter=',').T
+joint_acc = np.genfromtxt('../data/ARMTD_matlab/joint_acc.csv', delimiter=',').T
 
 # Obstacles data
 obstacle_info = np.genfromtxt('../data/ARMTD_matlab/matlab_obstacles.csv', delimiter=',')
@@ -48,6 +49,9 @@ for i in range(1, len(fetch_env.EnvId)):
 
 qpos = joint_pos[0]
 qvel = np.zeros(7)
+q_record = np.zeros([np.size(joint_pos, 0), 7])
+q_des_record = np.zeros([np.size(joint_pos, 0), 7])
+t_record = np.arange(0, 0.01*np.size(joint_pos, 0), 0.01)
 for step in range(num_step):
 
     # create zonotope visual
@@ -68,7 +72,11 @@ for step in range(num_step):
     for t in range(int(0.5/timestep)):
         if t % 10 == 0: 
             dataIndex += 1
-            qacc_d = (joint_vel[dataIndex]-joint_vel[dataIndex-1])/0.01
+            # qacc_d = (joint_vel[dataIndex]-joint_vel[dataIndex-1])/0.01
+            qacc_d = joint_acc[dataIndex-1]
+            q, _ = fetch_env.get_joint_states()
+            q_record[dataIndex-1] = q
+            q_des_record[dataIndex-1] = qpos
         qpos, qvel = fetch_env.get_joint_traj(qpos, qvel, qacc_d)
         torque = fetch_env.inversedynamics(qpos, qvel, qacc_d)
         fetch_env.torque_control(torque)
@@ -93,5 +101,12 @@ for step in range(num_step):
         fetch_env.remove_body(Id)
         recorder_zono_slc.unregister_object(Id)
 
+plt.plot(t_record[:-1], q_des_record[:-1], 'r--', label='q_desired')
+plt.plot(t_record[:-1], q_record[:-1], 'b-', label='q')
+plt.xlabel('time/s')
+plt.ylabel('position/rad')
+plt.legend()
+plt.show()
+breakpoint()
 recorder.save("../data/pkl/matlab_fetch.pkl")
 fetch_env.Disconnect()
