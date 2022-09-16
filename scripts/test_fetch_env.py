@@ -1,29 +1,34 @@
 from bullet.bulletRtdEnv import bulletRtdEnv
 from pybullet_blender_recorder.pyBulletSimRecorder import PyBulletRecorder
 import numpy as np
-import pybullet as p
+import pybullet as pbt
 import math as m
 
-timestep = 0.002
-fetch_env = bulletRtdEnv(timestep=timestep, useGravity=True)
-legoId, legoPath = fetch_env.load('./assets/objects/lego.urdf', [1, 0, 2])
-tableId, tablePath = fetch_env.load('./assets/table/table.urdf', [1, 0, 0], [0, 0, m.pi/2])
-cubeId, cubePath = fetch_env.load('./assets/objects/cube_small.urdf', [1, 0.5, 2])
+# set timestep for simulation, better be smaller than 0.001
+timestep = 0.0001
 
-recorder = PyBulletRecorder()
-for i in range(len(fetch_env.EnvId)):
-    recorder.register_object(fetch_env.EnvId[i], fetch_env.path[i])
+# initialize environment
+fetch_env = bulletRtdEnv(urdf_path="../assets/fetch/fetch_arm_new_dumbbell.urdf", timestep=timestep, useGravity=True)
 
+# load a few objects to the environment
+tableId, tablePath = fetch_env.load('../assets/table/table.urdf', [1, 0, 0], [0, 0, m.pi/2])
+cubeId, cubePath = fetch_env.load('../assets/objects/cube_small.urdf', [1, 0.5, 2])
+
+# simulation process
 t = 0.0
 t_total = 10
-action = np.random.uniform(-500, -300, len(fetch_env.rp))
-print(f"action = {action}")
+
+# loop through time
 for i in range(int(t_total/timestep)):
-    p.setJointMotorControlArray(fetch_env.robotId, fetch_env.actuation_index, p.TORQUE_CONTROL, forces=action)
-    p.stepSimulation()
-    if i%10 == 0:
-        recorder.add_keyframe()
+    # inverse dynamics controller
+    qacc = np.random.uniform(-0.5, 0.5, len(fetch_env.rp)) # use random acceleration
+    qpos, qvel = fetch_env.get_joint_states() # get current position and velocity
+    qpos_d, qvel_d = fetch_env.get_joint_traj(qpos, qvel, qacc) # get desired position and velocity
+    torque = fetch_env.inversedynamics(qpos_d, qvel_d, qacc) # calculate inverse dynamics
+    fetch_env.torque_control(torque) # command torque to robot
+
+    # step simulation
+    pbt.stepSimulation()
 
 breakpoint()
-recorder.save("data/demo_with_obstacle.pkl")
 fetch_env.Disconnect()

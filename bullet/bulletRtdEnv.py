@@ -1,14 +1,10 @@
+from email.charset import QP
 from typing import Tuple
 import pybullet as p
 import numpy as np
 import pybullet_data
 
 clid = p.connect(p.SHARED_MEMORY)
-Kp = np.eye(7)
-Kd = np.eye(7)
-for i in range(7):
-    Kp[i, i] = 100000*(1-0.15*i)
-    Kd[i, i] = 1.3*(Kp[i, i]/2)**0.5
 
 class bulletRtdEnv:
 
@@ -19,7 +15,8 @@ class bulletRtdEnv:
         timestep=0.001, 
         useGravity=True, 
         useRobot=True, 
-        useTorqueControl=True
+        useTorqueControl=True,
+        gain = 1000
         ):
 
         # enable GUI or not
@@ -62,6 +59,13 @@ class bulletRtdEnv:
             for i in range(self.numJoints):
                 p.changeDynamics(self.robotId, i-1, linearDamping=0, angularDamping=0)
         
+        # inv dynamics controller gain
+        self.Kp = np.eye(7)
+        self.Kd = np.eye(7)
+        for i in range(7):
+            self.Kp[i, i] = gain*(1-0.15*i)
+            self.Kd[i, i] = 1.3*(self.Kp[i, i]/2)**0.5
+
         self.path = [urdf_path]
 
     def get_joint_limits(self, bodyId: int):
@@ -96,11 +100,11 @@ class bulletRtdEnv:
         Qvel = []
         for i in range(self.numJoints):
             jointInfo = p.getJointInfo(self.robotId, i)
-            if jointInfo[3] > -1:
+            if jointInfo[3] > -1 and bytes('gripper', 'utf-8') not in jointInfo[1]:
                 qpos, qvel, _, _ = p.getJointState(self.robotId, i)
                 Qpos.append(qpos)
                 Qvel.append(qvel)
-        return Qpos, Qvel
+        return np.array(Qpos), np.array(Qvel)
 
     def get_joint_traj(self, qpos_pre: np.array, qvel_pre: np.array, qacc_d: np.array) -> Tuple[np.array, np.array]:
         """
@@ -149,8 +153,8 @@ class bulletRtdEnv:
         return: applied torque.
         """
         qpos, qvel = self.get_joint_states()
-        qacc = qacc_des + Kd.dot(qvel_des - np.array(qvel)) + Kp.dot(qpos_des - np.array(qpos))
-        torque = p.calculateInverseDynamics(self.robotId, qpos, qvel, qacc.tolist())
+        qacc = qacc_des + self.Kd.dot(qvel_des - np.array(qvel)) + self.Kp.dot(qpos_des - np.array(qpos))
+        torque = p.calculateInverseDynamics(self.robotId, qpos.tolist(), qvel.tolist(), qacc.tolist())
         return torque
 
     def torque_control(self, torque: np.array):
