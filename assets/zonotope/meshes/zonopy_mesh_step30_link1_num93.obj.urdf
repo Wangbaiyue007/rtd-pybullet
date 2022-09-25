@@ -1,0 +1,17 @@
+<robot name="zonopy_mesh_step30_link1_num93.obj">
+	<link name="link0">
+		<visual>
+			<origin xyz="0 0 0" rpy="0 0 0" />
+			<geometry>
+				<mesh filename="zonopy_mesh_step30_link1_num93.obj" scale="1.0 1.0 1.0" />
+			</geometry>
+			<material name="texture">
+				<color rgba="0.3 0.2 0.8 0.5" />
+			</material>
+		</visual>
+		<inertial>
+			<mass value="0" />
+			<inertia ixx="0.0" ixy="0.0" ixz="0.0" iyy="0.0" iyz="0.0" izz="0.0" />
+		</inertial>
+	<collision><geometry><mesh filename="zonopy_mesh_step30_link1_num93.obj" /></geometry></collision></link>
+</robot>
