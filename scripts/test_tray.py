@@ -8,7 +8,8 @@ import time
 
 timestep = 0.0001
 fetch_env = bulletRtdEnv(urdf_path="../assets/fetch/fetch_waiter.urdf", timestep=timestep, useGravity=True, useRobot=True, gain=100000)
-fetch_env.load("../assets/objects/cube_small.urdf", [0.91501, -0.88236, 1.0], ori=[0, 0, -m.pi/4]) # center of the tray
+fetch_env.load("../assets/objects/cube_small.urdf", pos=[0.91501, -0.88236, 1.0], ori=[0, 0, -m.pi/4], scale=0.1) # center of the tray
+fetch_env.load("plane.urdf", pos=[0, 0, 0], saveid=False)
 data = np.genfromtxt('../data/ARMTD_force/ARMTD_Force_Amazon_Demo_Success.csv', delimiter=',')
 joint_pos = data[:, :7]
 joint_vel = data[:, 7:]
@@ -17,14 +18,14 @@ fetch_env.forwardkinematics(joint_pos[0])
 
 recorder = PyBulletRecorder()
 for i in range(len(fetch_env.EnvId)):
-    recorder.register_object(fetch_env.EnvId[i], fetch_env.path[i])
+    recorder.register_object(fetch_env.EnvId[i], fetch_env.path[i], fetch_env.scale[i])
 
 # let object fall onto the tray
 for i in range(10000):
     torque = fetch_env.inversedynamics(joint_pos[0], np.zeros(7), np.zeros(7))
     fetch_env.torque_control(torque)
     pbt.stepSimulation()
-    if i%20 == 0:
+    if i%200 == 0:
         recorder.add_keyframe()
     # time.sleep(timestep)
 breakpoint()
@@ -60,7 +61,7 @@ for i in range(steps):
         recorder.add_keyframe()
 
     # wait some time to make the sim more realistic
-    time.sleep(timestep)
+    # time.sleep(timestep)
 
 
 # plot results

@@ -67,6 +67,7 @@ class bulletRtdEnv:
             self.Kd[i, i] = 1.3*(self.Kp[i, i]/2)**0.5
 
         self.path = [urdf_path]
+        self.scale = [[1, 1, 1]]
 
     def get_joint_limits(self, bodyId: int):
         lowerLimits, upperLimits, jointRanges, restPoses = [], [], [], []
@@ -173,15 +174,17 @@ class bulletRtdEnv:
         quat = p.getQuaternionFromEuler(euler)
         return quat
 
-    def load(self, filename: str, pos: list=[0, 0, 0], ori: list=[0, 0, 0], scale: float=1) -> Tuple[int, str]:
+    def load(self, filename: str, pos: list=[0, 0, 0], ori: list=[0, 0, 0], scale: float=1, saveid: bool=True) -> Tuple[int, str]:
         """
         Loading an object from URDF. \n
         return: object id.
         """
         objId = p.loadURDF(filename, globalScaling=scale)
-        self.EnvId.append(objId)
-        self.path.append(filename)
-        
+        if saveid:
+            self.EnvId.append(objId)
+            self.path.append(filename)
+            self.scale.append([scale]*3)
+            
         ori = self.Euler2Quat(ori)
         p.resetBasePositionAndOrientation(objId, pos, ori)
         return objId, filename
