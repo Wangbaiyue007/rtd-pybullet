@@ -1,4 +1,3 @@
-from email.charset import QP
 from typing import Tuple
 import pybullet as p
 import numpy as np
@@ -97,7 +96,7 @@ class bulletRtdEnv:
         """
         RRT algorithm that builds waypoints.
         """
-        from rrt.rrt import BuildRRT, Node
+        from bullet.rrt import BuildRRT
         start_pos, _ = self.get_joint_states()
         self.goal_pos = np.array(goal_pos)
 
