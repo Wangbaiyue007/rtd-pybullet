@@ -7,7 +7,7 @@ import math as m
 import time
 
 timestep = 0.0001
-fetch_env = bulletRtdEnv(urdf_path="../assets/fetch/fetch_waiter.urdf", timestep=timestep, useGravity=True, useRobot=True, gain=100000)
+fetch_env = bulletRtdEnv(urdf_path="../assets/fetch/fetch_waiter.urdf", timestep=timestep, useGravity=True, useRobot=True, control_gain=100000)
 fetch_env.load("../assets/objects/cube_small.urdf", pos=[0.91501, -0.88236, 1.0], ori=[0, 0, -m.pi/4], scale=0.1) # center of the tray
 fetch_env.load("plane.urdf", pos=[0, 0, 0], saveid=False)
 data = np.genfromtxt('../data/ARMTD_force/ARMTD_Force_Amazon_Demo_Success.csv', delimiter=',')

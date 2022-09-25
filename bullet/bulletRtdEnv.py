@@ -3,6 +3,10 @@ from typing import Tuple
 import pybullet as p
 import numpy as np
 import pybullet_data
+# zonopy
+import torch
+from zonopy.environments.arm_3d import Arm_3D
+from zonopy.optimize.armtd_3d import ARMTD_3D_planner
 
 clid = p.connect(p.SHARED_MEMORY)
 
@@ -13,12 +17,17 @@ class bulletRtdEnv:
         urdf_path="../assets/fetch/fetch.urdf", 
         GUI=True, 
         timestep=0.001, 
+        control_gain = 1000,
         useGravity=True, 
         useRobot=True, 
         useTorqueControl=True,
-        gain = 1000
+        useZonopy=False,
+        q0 = [0]*7, 
+        qgoal = [0]*7, 
+        obs_pos = [[]],
         ):
 
+        ### PyBullet ###
         # enable GUI or not
         if GUI:
             if (clid < 0): p.connect(p.GUI)
@@ -50,6 +59,7 @@ class bulletRtdEnv:
 
             # set robot joint limits and rest positions
             self.ll, self.ul, self.jr, self.rp = self.get_joint_limits(self.robotId)
+            breakpoint()
 
         if useTorqueControl and useRobot:
             # Disable the motors for torque control
@@ -63,11 +73,47 @@ class bulletRtdEnv:
         self.Kp = np.eye(7)
         self.Kd = np.eye(7)
         for i in range(7):
-            self.Kp[i, i] = gain*(1-0.15*i)
+            self.Kp[i, i] = control_gain*(1-0.15*i)
             self.Kd[i, i] = 1.3*(self.Kp[i, i]/2)**0.5
 
         self.path = [urdf_path]
         self.scale = [[1, 1, 1]]
+
+        if useZonopy:
+            self.zonopy = self.Zonopy(q0=q0, qgoal=qgoal, obs_pos=obs_pos)
+
+    def simulate(self, ka):
+        steps = int(0.5/self.timestep)
+        for i in range(steps):
+            # calculate desired trajectory
+            qpos_d, qvel_d = self.get_joint_traj(qpos_d[i], qvel_d[i], ka)
+            # inverse dynamics controller
+            torque = self.inversedynamics(qpos_d[i+1], qvel_d[i+1], ka)
+            # print(f"joint torques: {torque}")
+            self.torque_control(torque)
+            p.stepSimulation()
+
+    def _rrt(self, goal_pos=[]):
+        """
+        RRT algorithm that builds waypoints.
+        """
+        from rrt.rrt import BuildRRT, Node
+        start_pos, _ = self.get_joint_states()
+        self.goal_pos = np.array(goal_pos)
+
+        # build rrt tree with specified goal bias and step size
+        goal_bias = 0.2
+        step_size = 0.05
+        rrt_builder = BuildRRT(self, start_pos, self.goal_pos, goal_bias, step_size)
+        success = rrt_builder.build_tree()
+        if success:
+            rrt_builder.backtrace()
+            rrt_builder.shortcut_smoothing()
+            self.robot.set_robot_joint_positions(start_pos)
+            waypoints = rrt_builder.solution
+            return waypoints, success
+        else:
+            return 0, False
 
     def get_joint_limits(self, bodyId: int):
         lowerLimits, upperLimits, jointRanges, restPoses = [], [], [], []
@@ -245,3 +291,35 @@ class bulletRtdEnv:
 
     def Disconnect(self):
         p.disconnect()
+
+    class Zonopy:
+
+        def __init__(self, q0 = [0]*7, qgoal = [0]*7, obs_pos = [[]], dtype = torch.float, device = 'cuda:0'):
+            self.arm3d = Arm_3D(robot="Kinova3", n_obs=1, FO_render_freq=25)
+            self.q = torch.tensor(q0, dtype=dtype, device=device)
+            self.qd = torch.zeros(self.arm3d.n_links, dtype=dtype, device=device)
+            self.qgoal = torch.tensor(qgoal, dtype=dtype, device=device)
+            obs_pos = torch.tensor(obs_pos, dtype=dtype, device=device)
+            self.arm3d.set_initial(self.q, self.qd, self.qgoal, obs_pos)
+            self.planner = ARMTD_3D_planner(self.arm3d, dtype=dtype, device=device)
+            self.ka_0 = torch.zeros(self.arm3d.dof)
+
+        def step(self):
+            print(f"Iteration {iter}")
+            ka, flag = self.planner.plan(self.arm3d, self.ka_0)
+            ka_break = (-self.arm3d.qvel) / 0.5
+
+            print(f"qvel_prestep: {self.arm3d.qvel}")
+            observations, reward, done, info = self.arm3d.step(ka.cpu(), flag)
+            print(f"qvel_poststep: {self.arm3d.qvel}")
+
+            safe = self.arm3d.safe
+            if safe:
+                print("--safe move--")
+                qacc = ka.cpu()
+            else:
+                print("--safe break--")
+                qacc = ka_break.cpu()
+            print(f"qacc: {qacc}")
+
+            return qacc, done
