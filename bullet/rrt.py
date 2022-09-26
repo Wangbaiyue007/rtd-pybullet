@@ -1,6 +1,7 @@
 import numpy as np
 from robosuite.utils.mjcf_utils import BLUE
 import random
+import torch
 # from ..rts.envs.robots.load_robot import load_sinlge_robot_arm_params
 
 
@@ -36,14 +37,11 @@ class BuildRRT:
         self.goal_bias = goal_bias
         self.solution = []
 
-        ll, ul, _, _ = self.env.get_joint_limits(self.env.robotId)
+        self.dof_limits = []
         for joint in range(7):
-            self.dof_limits[joint] = np.array([ll[joint], ul[joint]])
-        
+            self.dof_limits.append(np.array([self.env.ll[joint], self.env.ul[joint]]))
+        self.dof_limits = np.array(self.dof_limits)
         self.tree_list = [self.current]
-
-        # env.reset()
-        env.forwardkinematics(self.start.pos)
 
         print("******** RRT PARAMS *********")
         print(f"Start QPos: {self.start.pos}")
@@ -64,13 +62,12 @@ class BuildRRT:
     def _check_if_node_in_free_cspace(self, node):
         if not self._check_within_limits(node):
             return False
-        self.env.forwardkinematics(node.pos)
-        return not self.env.collision_check(node.pos)
+        pos = torch.tensor(node.pos, dtype=torch.float)
+        return not self.env.zonopy.arm3d.collision_check(pos)
 
     def _check_within_limits(self, node):
         # Joint limits with same lower and upper bounds have no limits
         joints_with_limits = self.dof_limits[:, 0] != self.dof_limits[:, 1]
-        # import pdb; pdb.set_trace()
         return (
             (node.pos[joints_with_limits] >=
                 self.dof_limits[joints_with_limits, 0]
@@ -86,7 +83,7 @@ class BuildRRT:
         while True:
             joints_with_limits = self.dof_limits[:, 0] != self.dof_limits[:, 1]
             new_node = Node([random.uniform(self.dof_limits[i, 0], self.dof_limits[i, 1]) if joints_with_limits[i] else (random.uniform(-np.pi, np.pi) if i != 0 else random.uniform(-np.pi/2, np.pi/2))
-                            for i in range(7-1)], parent=None)
+                            for i in range(7)], parent=None)
             if self._check_if_node_in_free_cspace(new_node):
                 return new_node
 
@@ -123,7 +120,6 @@ class BuildRRT:
             self.tree_list.append(new_node)
             self.current = new_node
 
-            self.env.forwardkinematics(new_node.pos)
             '''
             ee_pos = self.env.sim.data.site_xpos[self.robot.eef_site_id].copy()
             DebugHelper.add_new_marker_to_env(

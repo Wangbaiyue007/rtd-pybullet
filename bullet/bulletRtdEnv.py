@@ -1,3 +1,5 @@
+import sys
+import time
 from typing import Tuple
 import pybullet as p
 import numpy as np
@@ -58,7 +60,6 @@ class bulletRtdEnv:
 
             # set robot joint limits and rest positions
             self.ll, self.ul, self.jr, self.rp = self.get_joint_limits(self.robotId)
-            breakpoint()
 
         if useTorqueControl and useRobot:
             # Disable the motors for torque control
@@ -78,19 +79,28 @@ class bulletRtdEnv:
         self.path = [urdf_path]
         self.scale = [[1, 1, 1]]
 
+        # initialize zonopy and its environment
+        self.qgoal = qgoal
         if useZonopy:
-            self.zonopy = self.Zonopy(q0=q0, qgoal=qgoal, obs_pos=obs_pos)
+            self.zonopy = self.Zonopy(q0=q0, qgoal=self.qgoal, obs_pos=obs_pos)
+            for obs in obs_pos:
+                self.load("../assets/objects/cube_small_zero.urdf", pos= obs, scale=0.1)
 
-    def simulate(self, ka):
+    def step(self, ka):
+        """
+        Step for 1 planning iteration (0.5 s) in pybullet
+        """
+        ka = ka.numpy()
         steps = int(0.5/self.timestep)
+        qpos_d, qvel_d = self.get_joint_states()
         for i in range(steps):
             # calculate desired trajectory
-            qpos_d, qvel_d = self.get_joint_traj(qpos_d[i], qvel_d[i], ka)
+            qpos_d, qvel_d = self.get_joint_traj(qpos_d, qvel_d, ka)
             # inverse dynamics controller
-            torque = self.inversedynamics(qpos_d[i+1], qvel_d[i+1], ka)
-            # print(f"joint torques: {torque}")
+            torque = self.inversedynamics(qpos_d, qvel_d, ka)
             self.torque_control(torque)
             p.stepSimulation()
+            time.sleep(self.timestep)
 
     def _rrt(self, goal_pos=[]):
         """
@@ -105,14 +115,57 @@ class bulletRtdEnv:
         step_size = 0.05
         rrt_builder = BuildRRT(self, start_pos, self.goal_pos, goal_bias, step_size)
         success = rrt_builder.build_tree()
+        breakpoint()
         if success:
             rrt_builder.backtrace()
             rrt_builder.shortcut_smoothing()
-            self.robot.set_robot_joint_positions(start_pos)
             waypoints = rrt_builder.solution
             return waypoints, success
         else:
             return 0, False
+
+    def _armtd_track(self, waypoints):
+        """
+        Tracking waypoints using armtd
+        """
+        for point in range(len(waypoints)):
+            print("point: ", point)
+            waypoint = waypoints[point]
+            self.zonopy.arm3d.qgoal = torch.tensor(waypoint.pos, dtype=self.zonopy.arm3d.dtype, device=self.zonopy.arm3d.device)
+            qacc, done = self.zonopy.step()
+            self.zonopy.arm3d.render()
+            self.step(qacc)
+            # minimize goal position error
+            '''
+            if point == len(waypoints) -1:
+                print("\nApproaching goal...\n")
+                index = 0
+                self.qpos_e = np.zeros(7)
+                while True:
+                    info = self.local_attractor(self.goal_pos, index)
+                    index += 1
+                    collision = info['collision']
+                    qpos, qvel = self._get_state()
+                    if precise_goal and (self.goal_distance(qpos, self.goal_pos) < 0.02 and np.linalg.norm(qvel) < 0.005): 
+                        success = True
+                        break
+                    if (not precise_goal) and (self.goal_distance(qpos, self.goal_pos) < 0.1 and np.linalg.norm(qvel) < 0.1):
+                        success = True
+                        break
+            '''
+                
+        return done
+            
+    def simulate(self, goal_pos):
+        """
+        Simulate process of rrt + armtd
+        """
+        waypoints, success = self._rrt(goal_pos=goal_pos)
+        if success:
+            self._armtd_track(waypoints)
+        else:
+            sys.exit("RRT failed to build tree.")
+
 
     def get_joint_limits(self, bodyId: int):
         lowerLimits, upperLimits, jointRanges, restPoses = [], [], [], []
@@ -294,12 +347,12 @@ class bulletRtdEnv:
     class Zonopy:
 
         def __init__(self, q0 = [0]*7, qgoal = [0]*7, obs_pos = [[]], dtype = torch.float, device = 'cuda:0'):
-            self.arm3d = Arm_3D(robot="Kinova3", n_obs=1, FO_render_freq=25)
-            self.q = torch.tensor(q0, dtype=dtype, device=device)
-            self.qd = torch.zeros(self.arm3d.n_links, dtype=dtype, device=device)
-            self.qgoal = torch.tensor(qgoal, dtype=dtype, device=device)
+            self.arm3d = Arm_3D(robot="Kinova3", n_obs=len(obs_pos), FO_render_freq=25)
+            q = torch.tensor(q0, dtype=dtype, device=device)
+            qd = torch.zeros(self.arm3d.n_links, dtype=dtype, device=device)
+            qgoal = torch.tensor(qgoal, dtype=dtype, device=device)
             obs_pos = torch.tensor(obs_pos, dtype=dtype, device=device)
-            self.arm3d.set_initial(self.q, self.qd, self.qgoal, obs_pos)
+            self.arm3d.set_initial(q, qd, qgoal, obs_pos)
             self.planner = ARMTD_3D_planner(self.arm3d, dtype=dtype, device=device)
             self.ka_0 = torch.zeros(self.arm3d.dof)
 
