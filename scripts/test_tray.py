@@ -1,5 +1,5 @@
 from bullet.bulletRtdEnv import bulletRtdEnv
-from pybullet_blender_recorder.pyBulletSimRecorder import PyBulletRecorder
+from recorder.pyBulletSimRecorder import PyBulletRecorder
 import numpy as np
 import pybullet as pbt
 import matplotlib.pyplot as plt
