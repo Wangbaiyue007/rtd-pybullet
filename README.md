@@ -12,7 +12,10 @@ Running ARMTD ([Autonomous Reachability-based Manipulator Trajectory Design](htt
     <img src="data/gif/fetch_force_closure.gif">
 <p/>
 
-## Instructions
+## Runnint zonopy + pybullet
+Go to `scripts/` and run `test_bullet_zonopy.py` to see what happens.
+
+## Rendering trajectory and zonotopes
 ### 0. Notes
 - At the root folder, run `pip install -e .` to set up the package.
 - The physics engine of the smulation is [Bullet](https://github.com/bulletphysics/bullet3). For more information, check out their [documentation](https://pybullet.org/wordpress/index.php/forum-2/).
@@ -34,5 +37,3 @@ The pre-computed trajectories are discrete time and are assumed to be perfect tr
 ### V. Render animation using Blender
 With all the `.pkl` files, it is easy to do the rendering by importing them to Blender. Check out the instructions [here](https://github.com/huy-ha/pybullet-blender-recorder).
 
-## TODO:
-Connect with MATLAB version of ARMTD.
