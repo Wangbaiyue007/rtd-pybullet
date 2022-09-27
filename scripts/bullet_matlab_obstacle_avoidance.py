@@ -24,11 +24,11 @@ for i in range(np.size(obstacle_info, 0)):
         index += 1
 
 # Zonotope data
-path_to_zono = '../zonotope/meshes_matlab/'
+path_to_zono = '../assets/zonotope/meshes_matlab/'
 files_zono = os.listdir(path_to_zono)
 
 # Initialize simulation
-num_step = 27
+num_step = 12
 timestep = 0.001
 fetch_env = bulletRtdEnv(urdf_path="../assets/fetch/fetch_arm_new_dumbbell.urdf", timestep=timestep, useGravity=True, useRobot=True)
 

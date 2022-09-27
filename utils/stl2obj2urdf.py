@@ -10,7 +10,7 @@ def convert_mesh(inputfile, outputfile):
     # save the current mesh with default parameters
     ms.save_current_mesh(outputfile)
 
-path = '../zonotope/meshes_matlab/'
+path = '../assets/zonotope/meshes_matlab/'
 dir_list = os.listdir(path)
 
 # convert all .dae file to .obj
