@@ -28,13 +28,13 @@ path_to_zono = '../assets/zonotope/meshes_matlab/'
 files_zono = os.listdir(path_to_zono)
 
 # Initialize simulation
-num_step = 12
+num_step = 6
 timestep = 0.001
-fetch_env = bulletRtdEnv(urdf_path="../assets/fetch/fetch_arm_new_dumbbell.urdf", timestep=timestep, useGravity=True, useRobot=True)
+fetch_env = bulletRtdEnv(urdf_path="../assets/fetch/fetch_arm_new_dumbbell.urdf", timestep=timestep, useGravity=True, useRobot=True, control_gain=10000)
 
 # initialize obstacle positions and robot positions
 for i in range(np.size(obstacle_pos, 0)):
-    fetch_env.load("../assets/objects/cube_small_zero.urdf", pos=obstacle_pos[i], scale=0.01)
+    fetch_env.load("../assets/objects/cube_small_zero.urdf", pos=obstacle_pos[i], scale=0.1)
 fetch_env.forwardkinematics(joint_pos[0])
 
 # initialize renderer

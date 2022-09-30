@@ -155,6 +155,20 @@ class bulletRtdEnv:
             '''
                 
         return done
+
+    def _armtd_track_hardware(self, waypoints):
+        """
+        Tracking waypoints using armtd
+        """
+        for point in range(len(waypoints)):
+            print("point: ", point)
+            waypoint = waypoints[point]
+            self.zonopy.arm3d.qgoal = torch.tensor(waypoint.pos, dtype=self.zonopy.arm3d.dtype, device=self.zonopy.arm3d.device)
+            qacc, done = self.zonopy.step()
+            self.zonopy.arm3d.render()
+            self.step(qacc)
+                
+        return done
             
     def simulate(self, goal_pos):
         """

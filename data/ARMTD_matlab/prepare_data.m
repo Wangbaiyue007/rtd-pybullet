@@ -1,6 +1,6 @@
 clear; clc;
 %% load data
-load('table_demo_bernstein_pi36.mat');
+load('table_demo_bernstein_pi36_obstacles.mat');
 
 %% save joint trajectories
 joint_pos = summary.trajectory([1:2:13], :);
@@ -21,7 +21,7 @@ writematrix(Z, 'matlab_obstacles.csv');
 
 %% save FO
 clearvars -except P;
-for iter = 1:12
+for iter = 1:6
     for link = 1:9
         verts_slc_ = [];
         verts_ = [];
