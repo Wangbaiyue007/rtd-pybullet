@@ -164,7 +164,7 @@ class bulletRtdEnv:
             print("point: ", point)
             waypoint = waypoints[point]
             self.zonopy.arm3d.qgoal = torch.tensor(waypoint.pos, dtype=self.zonopy.arm3d.dtype, device=self.zonopy.arm3d.device)
-            qacc, done = self.zonopy.step()
+            qacc, done = self.zonopy.step_hardware()
             self.zonopy.arm3d.render()
             self.step(qacc)
                 
@@ -369,6 +369,7 @@ class bulletRtdEnv:
             self.arm3d.set_initial(q, qd, qgoal, obs_pos)
             self.planner = ARMTD_3D_planner(self.arm3d, dtype=dtype, device=device)
             self.ka_0 = torch.zeros(self.arm3d.dof)
+            self.ka = torch.zeros(self.arm3d.dof)
 
         def step(self):
             print(f"Iteration {iter}")
@@ -387,5 +388,26 @@ class bulletRtdEnv:
                 print("--safe break--")
                 qacc = ka_break.cpu()
             print(f"qacc: {qacc}")
+
+            return qacc, done
+
+        def step_hardware(self):
+            print(f"Iteration {iter}")
+            ka, flag = self.planner.plan_hardware(self.arm3d, self.ka_0, self.ka)
+            ka_break = (-self.arm3d.qvel) / 0.5
+
+            print(f"qvel_prestep: {self.arm3d.qvel}")
+            observations, reward, done, info = self.arm3d.step(self.ka.cpu(), flag)
+            print(f"qvel_poststep: {self.arm3d.qvel}")
+
+            safe = self.arm3d.safe
+            if safe:
+                print("--safe move--")
+                qacc = ka.cpu()
+            else:
+                print("--safe break--")
+                qacc = ka_break.cpu()
+            print(f"qacc: {qacc}")
+            self.ka = qacc
 
             return qacc, done
