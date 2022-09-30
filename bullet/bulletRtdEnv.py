@@ -115,7 +115,6 @@ class bulletRtdEnv:
         step_size = 0.05
         rrt_builder = BuildRRT(self, start_pos, self.goal_pos, goal_bias, step_size)
         success = rrt_builder.build_tree()
-        breakpoint()
         if success:
             rrt_builder.backtrace()
             rrt_builder.shortcut_smoothing()
