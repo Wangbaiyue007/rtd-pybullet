@@ -1,5 +1,4 @@
 import numpy as np
-from robosuite.utils.mjcf_utils import BLUE
 import random
 import torch
 # from ..rts.envs.robots.load_robot import load_sinlge_robot_arm_params
