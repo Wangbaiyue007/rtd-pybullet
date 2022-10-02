@@ -16,7 +16,8 @@ class bulletRtdEnv:
     def __init__(
         self, 
         urdf_path="../assets/fetch/fetch.urdf", 
-        GUI=True, 
+        bulletGUI=True, 
+        zonopyGUI=True,
         timestep=0.001, 
         control_gain = 1000,
         useGravity=True, 
@@ -28,9 +29,9 @@ class bulletRtdEnv:
         obs_pos = [[]],
         ):
 
-        ### PyBullet ###
+        ############################## bullet #############################
         # enable GUI or not
-        if GUI:
+        if bulletGUI:
             if (clid < 0): p.connect(p.GUI)
         else:
             if (clid < 0): p.connect(p.DIRECT)
@@ -79,7 +80,9 @@ class bulletRtdEnv:
         self.path = [urdf_path]
         self.scale = [[1, 1, 1]]
 
+        ############################## zonopy #############################
         # initialize zonopy and its environment
+        self.zonopyGUI = zonopyGUI
         self.qgoal = qgoal
         if useZonopy:
             self.zonopy = self.Zonopy(q0=q0, qgoal=self.qgoal, obs_pos=obs_pos)
@@ -155,19 +158,22 @@ class bulletRtdEnv:
                 
         return done
 
-    def _armtd_track_hardware(self, waypoints):
+    def armtd_track_hardware(self, waypoint):
         """
-        Tracking waypoints using armtd
+        Tracking a waypoint using armtd
         """
-        for point in range(len(waypoints)):
-            print("point: ", point)
-            waypoint = waypoints[point]
-            self.zonopy.arm3d.qgoal = torch.tensor(waypoint.pos, dtype=self.zonopy.arm3d.dtype, device=self.zonopy.arm3d.device)
-            qacc, done = self.zonopy.step_hardware()
-            self.zonopy.arm3d.render()
-            self.step(qacc)
+
+        # modify goal position as next waypoint
+        self.zonopy.arm3d.qgoal = torch.tensor(waypoint.pos, dtype=self.zonopy.arm3d.dtype, device=self.zonopy.arm3d.device)
+        # modify robot state using hardware data
+        qpos_hardware, qvel_hardware = self.get_joint_states_hardware()
+        # plan and step zonopy environment
+        qacc, done = self.zonopy.step_hardware(qpos_hardware, qvel_hardware)
+        if self.zonopyGUI: self.zonopy.arm3d.render()
+        # step pybullet environment
+        self.step(qacc)
                 
-        return done
+        return qacc
             
     def simulate(self, goal_pos):
         """
@@ -217,6 +223,12 @@ class bulletRtdEnv:
                 Qpos.append(qpos)
                 Qvel.append(qvel)
         return np.array(Qpos), np.array(Qvel)
+
+    def get_joint_states_hardware(self):
+        """
+        TODO: Return the hardware joint states
+        """
+        return 
 
     def get_joint_traj(self, qpos_pre: np.array, qvel_pre: np.array, qacc_d: np.array) -> Tuple[np.array, np.array]:
         """
@@ -390,15 +402,19 @@ class bulletRtdEnv:
 
             return qacc, done
 
-        def step_hardware(self):
-            print(f"Iteration {iter}")
+        def step_hardware(self, qpos_hardware, qvel_hardware):
+            # correct env state using hardware data
+            self.arm3d.qpos = qpos_hardware
+            self.arm3d.qvel = qvel_hardware
+
+            # plan for the future 0.5 sec, which should be used for the next step
             ka, flag = self.planner.plan_hardware(self.arm3d, self.ka_0, self.ka)
             ka_break = (-self.arm3d.qvel) / 0.5
 
-            print(f"qvel_prestep: {self.arm3d.qvel}")
+            # step the previous plan in the zonopy environment
             observations, reward, done, info = self.arm3d.step(self.ka.cpu(), flag)
-            print(f"qvel_poststep: {self.arm3d.qvel}")
 
+            # fail save manuvoir
             safe = self.arm3d.safe
             if safe:
                 print("--safe move--")
@@ -407,6 +423,8 @@ class bulletRtdEnv:
                 print("--safe break--")
                 qacc = ka_break.cpu()
             print(f"qacc: {qacc}")
+
+            # Update the plan
             self.ka = qacc
 
-            return qacc, done
+            return qacc
