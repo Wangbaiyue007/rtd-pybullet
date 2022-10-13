@@ -27,10 +27,12 @@ class bulletRtdEnv:
         q0 = [0]*7, 
         qgoal = [0]*7, 
         obs_pos = [[]],
+        debug=True
         ):
 
         ############################## bullet #############################
         # enable GUI or not
+        self.bulletGUI = bulletGUI
         if bulletGUI:
             if (clid < 0): p.connect(p.GUI)
         else:
@@ -45,6 +47,9 @@ class bulletRtdEnv:
 
         p.setAdditionalSearchPath(pybullet_data.getDataPath())
         # p.loadURDF('plane.urdf')
+
+        # set debug
+        self.debug = debug
 
         self.EnvId = []
         if useRobot:
@@ -89,13 +94,35 @@ class bulletRtdEnv:
             for obs in obs_pos:
                 self.load("../assets/objects/cube_small_zero.urdf", pos= obs, scale=0.1)
 
-    def step(self, ka):
+    def step(self, ka, qpos=[], qvel=[]):
         """
         Step for 1 planning iteration (0.5 s) in pybullet
         """
         ka = ka.numpy()
         steps = int(0.5/self.timestep)
-        qpos_d, qvel_d = self.get_joint_states()
+
+        if len(qpos_d) == 0 and len(qvel_d) == 0:
+            qpos, qvel = self.get_joint_states()
+
+        for i in range(steps):
+            # calculate desired trajectory
+            qpos_d, qvel_d = self.get_joint_traj(qpos, qvel, ka)
+            # inverse dynamics controller
+            torque = self.inversedynamics(qpos_d, qvel_d, ka)
+            self.torque_control(torque)
+            p.stepSimulation()
+            # time.sleep(self.timestep)
+    
+    def step_hardware(self, ka, ka_pre, qpos_d=[], qvel_d=[]):
+        """
+        Step for 1 planning iteration (0.5 s) in pybullet
+        """
+        ka = ka.numpy()
+        steps = int(0.5/self.timestep)
+
+        if len(qpos_d) == 0 and len(qvel_d) == 0:
+            qpos_d, qvel_d = self.get_joint_states()
+
         for i in range(steps):
             # calculate desired trajectory
             qpos_d, qvel_d = self.get_joint_traj(qpos_d, qvel_d, ka)
@@ -103,9 +130,9 @@ class bulletRtdEnv:
             torque = self.inversedynamics(qpos_d, qvel_d, ka)
             self.torque_control(torque)
             p.stepSimulation()
-            time.sleep(self.timestep)
+            # time.sleep(self.timestep)
 
-    def _rrt(self, goal_pos=[]):
+    def rrt(self, goal_pos=[]):
         """
         RRT algorithm that builds waypoints.
         """
@@ -165,21 +192,23 @@ class bulletRtdEnv:
 
         # modify goal position as next waypoint
         self.zonopy.arm3d.qgoal = torch.tensor(waypoint.pos, dtype=self.zonopy.arm3d.dtype, device=self.zonopy.arm3d.device)
-        # modify robot state using hardware data
-        qpos_hardware, qvel_hardware = self.get_joint_states_hardware()
+        # modify robot state using hardware data;
         # plan and step zonopy environment
-        qacc, done = self.zonopy.step_hardware(qpos_hardware, qvel_hardware)
-        if self.zonopyGUI: self.zonopy.arm3d.render()
-        # step pybullet environment
-        self.step(qacc)
-                
-        return qacc
+        qacc, done = self.zonopy.step_hardware(self.qpos_hardware, self.qvel_hardware)
+        if self.zonopyGUI[0]:
+            self.zonopy.arm3d.render()
+        # step pybullet environment using the previous plan
+        if self.bulletGUI[0]:
+            self.step(self.zonopy.ka_pre, qpos=self.qpos_hardware, qvel=self.qvel_hardware)
+        
+        # return new plan
+        return done, qacc
             
     def simulate(self, goal_pos):
         """
         Simulate process of rrt + armtd
         """
-        waypoints, success = self._rrt(goal_pos=goal_pos)
+        waypoints, success = self.rrt(goal_pos=goal_pos)
         if success:
             self._armtd_track(waypoints)
         else:
@@ -224,11 +253,9 @@ class bulletRtdEnv:
                 Qvel.append(qvel)
         return np.array(Qpos), np.array(Qvel)
 
-    def get_joint_states_hardware(self):
-        """
-        TODO: Return the hardware joint states
-        """
-        return 
+    def set_joint_states_hardware(self, qpos, qvel):
+        self.qpos_hardware = torch.tensor(qpos, dtype=self.zonopy.arm3d.dtype)
+        self.qvel_hardware = torch.tensor(qvel, dtype=self.zonopy.arm3d.dtype)
 
     def get_joint_traj(self, qpos_pre: np.array, qvel_pre: np.array, qacc_d: np.array) -> Tuple[np.array, np.array]:
         """
@@ -372,7 +399,7 @@ class bulletRtdEnv:
     class Zonopy:
 
         def __init__(self, q0 = [0]*7, qgoal = [0]*7, obs_pos = [[]], dtype = torch.float, device = 'cuda:0'):
-            self.arm3d = Arm_3D(robot="Kinova3", n_obs=len(obs_pos), FO_render_freq=25)
+            self.arm3d = Arm_3D(robot="Kinova3", n_obs=len(obs_pos), FO_render_freq=25, goal_threshold=0.1)
             q = torch.tensor(q0, dtype=dtype, device=device)
             qd = torch.zeros(self.arm3d.n_links, dtype=dtype, device=device)
             qgoal = torch.tensor(qgoal, dtype=dtype, device=device)
@@ -383,22 +410,29 @@ class bulletRtdEnv:
             self.ka = torch.zeros(self.arm3d.dof)
 
         def step(self):
-            print(f"Iteration {iter}")
+            
+            if self.debug:
+                print(f"Iteration {iter}")
             ka, flag = self.planner.plan(self.arm3d, self.ka_0)
             ka_break = (-self.arm3d.qvel) / 0.5
 
-            print(f"qvel_prestep: {self.arm3d.qvel}")
+            if self.debug:
+                print(f"qvel_prestep: {self.arm3d.qvel}")
             observations, reward, done, info = self.arm3d.step(ka.cpu(), flag)
-            print(f"qvel_poststep: {self.arm3d.qvel}")
+            if self.debug:
+                print(f"qvel_poststep: {self.arm3d.qvel}")
 
             safe = self.arm3d.safe
             if safe:
-                print("--safe move--")
+                if self.debug:
+                    print("--safe move--")
                 qacc = ka.cpu()
             else:
-                print("--safe break--")
+                if self.debug:
+                    print("--safe break--")
                 qacc = ka_break.cpu()
-            print(f"qacc: {qacc}")
+            if self.debug:
+                print(f"qacc: {qacc}")
 
             return qacc, done
 
@@ -422,9 +456,10 @@ class bulletRtdEnv:
             else:
                 print("--safe break--")
                 qacc = ka_break.cpu()
-            print(f"qacc: {qacc}")
+            # print(f"qacc: {qacc}")
 
             # Update the plan
+            self.ka_pre = self.ka
             self.ka = qacc
 
-            return qacc
+            return qacc, done
