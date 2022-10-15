@@ -84,8 +84,8 @@ for step in range(30):
         print("Done!")
         break
 breakpoint()
-np.savetxt("../assets/zonotope/data/zonopy_obstacles_pos.csv", observations['obstacle_pos'].numpy(), delimiter=",")
-np.savetxt("../assets/zonotope/data/zonopy_obstacles_size.csv", observations['obstacle_size'].numpy(), delimiter=",")
+np.savetxt("../data/ARMTD_zonopy/zonopy_obstacles_pos.csv", observations['obstacle_pos'].numpy(), delimiter=",")
+np.savetxt("../data/ARMTD_zonopy/zonopy_obstacles_size.csv", observations['obstacle_size'].numpy(), delimiter=",")
 np.savetxt("../data/ARMTD_zonopy/zonopy_qpos.csv", qpos, delimiter=",")
 np.savetxt("../data/ARMTD_zonopy/zonopy_qacc.csv", qacc, delimiter=",")
 # remove previous mesh
