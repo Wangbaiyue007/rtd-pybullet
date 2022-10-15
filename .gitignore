@@ -131,3 +131,11 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+.vscode/settings.json
+.idea/vcs.xml
+.idea/rtd-pybullet.iml
+.idea/modules.xml
+.idea/misc.xml
+.idea/inspectionProfiles/profiles_settings.xml
+zonopy
+zonopy
