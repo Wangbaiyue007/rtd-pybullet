@@ -10,7 +10,7 @@ import os
 
 num_step = 8
 timestep = 0.001
-kinova_env = bulletRtdEnv(urdf_path="../assets/kinova_gen3_7dof/kinova_with_robotiq_85.urdf", timestep=timestep, useGravity=True, useRobot=True)
+kinova_env = bulletRtdEnv(urdf_path="../assets/kinova_w_tray/CC_Kinova_combined.urdf", timestep=timestep, useGravity=True, useRobot=True)
 joint_pos = np.genfromtxt('../data/ARMTD_zonopy/zonopy_qpos.csv', delimiter=',')
 joint_acc = np.genfromtxt('../data/ARMTD_zonopy/zonopy_qacc.csv', delimiter=',')
 obstacle_pos = np.genfromtxt('../data/ARMTD_zonopy/zonopy_obstacles_pos.csv', delimiter=',')
@@ -23,7 +23,7 @@ files_zono = os.listdir(path_to_zono)
 for i in range(np.size(obstacle_pos, 0)):
     kinova_env.load("../assets/objects/cube_small_zero.urdf", obstacle_pos[i], scale=0.1)
 kinova_env.forwardkinematics(joint_pos[0])
-
+breakpoint()
 # initialize renderer
 recorder = PyBulletRecorder()
 recorder_zono = PyBulletRecorder()

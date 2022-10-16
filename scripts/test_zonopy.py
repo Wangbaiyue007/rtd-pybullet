@@ -5,6 +5,7 @@ import numpy as np
 from zonopy.environments.arm_3d import Arm_3D
 from zonopy.optimize.armtd_3d import ARMTD_3D_planner
 import os
+import math as m
 
 def save_zono(env:Arm_3D):
     for i in range(env.n_links):
@@ -47,9 +48,9 @@ observations = env.reset()
 # obs_pos = observations['obstacle_pos'] # obs_pos = [torch.tensor([.5,.5,0], dtype=torch.float, device='cuda:0')]
 # obs_size = observations['obstacle_size']
 joint_pos = np.genfromtxt('../data/ARMTD_matlab/joint_pos.csv', delimiter=',').T
-q0 = torch.tensor([-.5, 1.1, 0, 0.25, 0, 0.1, 0], dtype=torch.float, device='cuda:0')
+q0 = torch.tensor([-.5, 1.1, 0, 0.25, 0, 0.1, m.pi], dtype=torch.float, device='cuda:0')
 qd0 = torch.zeros(env.n_links, dtype=torch.float, device='cuda:0')
-qgoal = torch.tensor([.5, 1., 0, 0.25, 0, 0.1, 0], dtype=torch.float, device='cuda:0')
+qgoal = torch.tensor([.5, 1., 0, 0.25, 0, 0.1, m.pi], dtype=torch.float, device='cuda:0')
 observation = env.set_initial(q0, qd0, qgoal, obs_pos, obs_size)
 planner = ARMTD_3D_planner(env, device='cuda:0', dtype=torch.float)
 ka_0 = torch.zeros(env.dof)
