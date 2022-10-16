@@ -11,14 +11,14 @@ def save_zono(env:Arm_3D):
         FO_poly = np.empty((1,3))
         FO_poly_slc = np.empty((1,3))
         for j in range(100):
-            FO_poly_j = env.FO_poly[i][j].numpy()
-            FO_poly = np.concatenate([FO_poly, FO_poly_j.transpose(2,1,0).reshape(3,-1).T], axis=0)
-            FO_poly_j_slc = env.FO_poly_slc[i][j].numpy()
-            FO_poly_slc = np.concatenate([FO_poly_slc, FO_poly_j_slc.transpose(2,1,0).reshape(3,-1).T], axis=0)
+            FO_poly_j = env.FO_poly[i][j].numpy().transpose(2,1,0).reshape(3,-1).T
+            FO_poly = np.concatenate([FO_poly, FO_poly_j], axis=0)
+            FO_poly_j_slc = env.FO_poly_slc[i][j].numpy().transpose(2,1,0).reshape(3,-1).T
+            FO_poly_slc = np.concatenate([FO_poly_slc, FO_poly_j_slc], axis=0)
         filename = "../data/ARMTD_zonopy/zonopy_sim/zonopy_vertices_step"+str(step+1)+"_link"+str(i+1)+".csv"
-        np.savetxt(filename, FO_poly, delimiter=",")
+        np.savetxt(filename, np.delete(FO_poly,0,axis=0), delimiter=",")
         filename_slc = "../data/ARMTD_zonopy/zonopy_sim/zonopy_vertices_slc_step"+str(step+1)+"_link"+str(i+1)+".csv"
-        np.savetxt(filename_slc, FO_poly_slc, delimiter=",")
+        np.savetxt(filename_slc, np.delete(FO_poly_slc,0,axis=0), delimiter=",")
 
 def remove(path):
     dir_list = os.listdir(path)
@@ -83,13 +83,12 @@ for step in range(30):
     if done: 
         print("Done!")
         break
-breakpoint()
+
 np.savetxt("../data/ARMTD_zonopy/zonopy_obstacles_pos.csv", observations['obstacle_pos'].numpy(), delimiter=",")
 np.savetxt("../data/ARMTD_zonopy/zonopy_obstacles_size.csv", observations['obstacle_size'].numpy(), delimiter=",")
 np.savetxt("../data/ARMTD_zonopy/zonopy_qpos.csv", qpos, delimiter=",")
 np.savetxt("../data/ARMTD_zonopy/zonopy_qacc.csv", qacc, delimiter=",")
 # remove previous mesh
-dir_list = os.listdir("../assets/zonotope/meshes")
+dir_list = os.listdir("../assets/zonotope/meshes_zonopy")
 for file in dir_list:
-    if '.urdf' not in file:
-        os.remove("../assets/zonotope/meshes/"+file)
+    os.remove("../assets/zonotope/meshes_zonopy/"+file)
