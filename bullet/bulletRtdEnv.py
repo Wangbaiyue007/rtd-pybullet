@@ -6,8 +6,8 @@ import numpy as np
 import pybullet_data
 # zonopy
 import torch
-from zonopy.environments.arm_3d import Arm_3D
-from zonopy.optimize.armtd_3d import ARMTD_3D_planner
+# from zonopy.environments.arm_3d import Arm_3D
+# from zonopy.optimize.armtd_3d import ARMTD_3D_planner
 
 clid = p.connect(p.SHARED_MEMORY)
 
