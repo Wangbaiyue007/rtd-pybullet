@@ -85,7 +85,6 @@ for step in range(num_step):
         # record the video at 50 fps
         if t%20 == 0: 
             recorder.add_keyframe()
-            recorder_zono.add_keyframe()
 
     # dump recording and reset
     recorder_zono.save("../data/pkl/matlab_zono_step"+str(step+1)+".pkl")
@@ -107,6 +106,6 @@ plt.xlabel('time/s')
 plt.ylabel('position/rad')
 plt.legend()
 plt.show()
-breakpoint()
+
 recorder.save("../data/pkl/matlab_fetch.pkl")
 fetch_env.Disconnect()

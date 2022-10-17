@@ -2,7 +2,7 @@ data/ARMTD_matlab/matlab_sim
 data/ARMTD_matlab/*.mat
 data/ARMTD_zonopy/zonopy_sim
 assets/zonotope/meshes_matlab
-assets/zonotope/meshes
+assets/zonotope/meshes_zonopy
 *.asv
 
 # Byte-compiled / optimized / DLL files
