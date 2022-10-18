@@ -7,7 +7,7 @@ import math as m
 import time
 
 timestep = 0.0001
-fetch_env = bulletRtdEnv(urdf_path="../assets/kinova_w_tray/CC_Kinova_combined.urdf", timestep=timestep, useGravity=True, useRobot=True, control_gain=100000)
+fetch_env = bulletRtdEnv(urdf_path=".\\assets\\kinova_w_tray\\CC_Kinova_combined.urdf", timestep=timestep, useGravity=True, useRobot=True, control_gain=100000)
 joint_pos = np.array([[m.pi/4, -m.pi/8,0, -m.pi/2-m.pi/8, 0, m.pi/4,0],
 [m.pi/8, -m.pi/8,0, -m.pi/2-m.pi/8, 0, m.pi/4, m.pi/8],
 [0, -m.pi/8, 0, -m.pi/2-m.pi/8, 0, m.pi/4, 0],
