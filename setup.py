@@ -8,4 +8,5 @@ setup(name='rtdBullet',
       author='Baiyue Wang',
       author_email='baiyuew@umich.edu',
       packages = find_packages(),
+      install_requires=['pybullet']
      )

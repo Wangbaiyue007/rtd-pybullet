@@ -1,6 +1,6 @@
 clear; clc;
 %% load data
-load('test0822.mat');
+load('table_demo_bernstein_pi36_obstacles.mat');
 
 %% save joint trajectories
 joint_pos = summary.trajectory([1:2:13], :);
@@ -21,10 +21,10 @@ writematrix(Z, 'matlab_obstacles.csv');
 
 %% save FO
 clearvars -except P;
-for iter = 1:27
+for iter = 1:6
     for link = 1:9
-        verts_slc_ = zeros(3, 100*28);
-        verts_ = zeros(3, 100*28);
+        verts_slc_ = [];
+        verts_ = [];
         for timestep = 1:100
             % merge all timestep, reduce zonotope
             zono_slc = P.info.sliced_FO_zono{1, iter}{1, timestep}{1, link};
@@ -35,8 +35,8 @@ for iter = 1:27
             % convert to vertices
             ver_slc_ = vertices(zono_slc_);
             ver_ = vertices(zono_);
-            verts_slc_(:, 28*(timestep-1)+1:28*timestep) = ver_slc_;
-            verts_(:, 28*(timestep-1)+1:28*timestep) = ver_;
+            verts_slc_ = [verts_slc_ ver_slc_];
+            verts_ = [verts_ ver_];
         end
         %writematrix(verts_, append('matlab_sim/matlab_vertices_step', ...
         %             num2str(iter), '_link', num2str(link), '.csv'));
@@ -50,8 +50,8 @@ for iter = 1:27
         % generate convex hull for each link at each planning step
         [K,v] = convhull(verts_(1,:),verts_(2,:),verts_(3,:));
         [K_slc,v_slc] = convhull(verts_slc_(1,:),verts_slc_(2,:),verts_slc_(3,:));
-        stlwrite(append('../../zonotope/meshes_matlab/matlab_mesh_step', num2str(iter), '_link', num2str(link), '.stl'), K, verts_');
-        stlwrite(append('../../zonotope/meshes_matlab/matlab_mesh_slc_step', num2str(iter), '_link', num2str(link), '.stl'), K_slc, verts_slc_');
+        stlwrite(append('../../assets/zonotope/meshes_matlab/matlab_mesh_step', num2str(iter), '_link', num2str(link), '.stl'), K, verts_');
+        stlwrite(append('../../assets/zonotope/meshes_matlab/matlab_mesh_slc_step', num2str(iter), '_link', num2str(link), '.stl'), K_slc, verts_slc_');
         clear verts_ verts_slc_;
     end
 end

@@ -24,17 +24,17 @@ for i in range(np.size(obstacle_info, 0)):
         index += 1
 
 # Zonotope data
-path_to_zono = '../zonotope/meshes_matlab/'
+path_to_zono = '../assets/zonotope/meshes_matlab/'
 files_zono = os.listdir(path_to_zono)
 
 # Initialize simulation
-num_step = 27
+num_step = 6
 timestep = 0.001
-fetch_env = bulletRtdEnv(urdf_path="../assets/fetch/fetch_arm_new_dumbbell.urdf", timestep=timestep, useGravity=True, useRobot=True)
+fetch_env = bulletRtdEnv(urdf_path="../assets/fetch/fetch_arm_new_dumbbell.urdf", timestep=timestep, useGravity=True, useRobot=True, control_gain=10000)
 
 # initialize obstacle positions and robot positions
 for i in range(np.size(obstacle_pos, 0)):
-    fetch_env.load("../assets/objects/cube_small_zero.urdf", pos=obstacle_pos[i], scale=0.01)
+    fetch_env.load("../assets/objects/cube_small_zero.urdf", pos=obstacle_pos[i], scale=0.1)
 fetch_env.forwardkinematics(joint_pos[0])
 
 # initialize renderer
@@ -85,7 +85,6 @@ for step in range(num_step):
         # record the video at 50 fps
         if t%20 == 0: 
             recorder.add_keyframe()
-            recorder_zono.add_keyframe()
 
     # dump recording and reset
     recorder_zono.save("../data/pkl/matlab_zono_step"+str(step+1)+".pkl")
@@ -107,6 +106,6 @@ plt.xlabel('time/s')
 plt.ylabel('position/rad')
 plt.legend()
 plt.show()
-breakpoint()
+
 recorder.save("../data/pkl/matlab_fetch.pkl")
 fetch_env.Disconnect()

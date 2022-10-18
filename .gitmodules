@@ -1,4 +1,3 @@
-[submodule "zonopy"]
+[submodule "zonopy_ssh"]
 	path = zonopy
-	url = https://github.com/kwonyos/zonopy
-	branch = bullet
+	url = git@github.com:roahmlab/zonopy.git

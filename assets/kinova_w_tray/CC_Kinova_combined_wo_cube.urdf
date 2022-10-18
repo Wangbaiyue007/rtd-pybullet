@@ -14,7 +14,7 @@
     <visual>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="meshes/base_link.obj"/>
+        <mesh filename=".\meshes\base_link.obj"/>
       </geometry>
       <material name="">
         <color rgba="0.75294 0.75294 0.75294 1"/>
@@ -23,7 +23,7 @@
     <collision>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="meshes/base_link.STL"/>
+        <mesh filename=".\meshes\base_link.STL"/>
       </geometry>
     </collision>
   </link>
@@ -37,7 +37,7 @@
     <visual>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="meshes/shoulder_link.obj"/>
+        <mesh filename=".\meshes\shoulder_link.obj"/>
       </geometry>
       <material name="">
         <color rgba="0.75294 0.75294 0.75294 1"/>
@@ -46,7 +46,7 @@
     <collision>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="meshes/shoulder_link.STL"/>
+        <mesh filename=".\meshes\shoulder_link.STL"/>
       </geometry>
     </collision>
   </link>
@@ -56,8 +56,7 @@
     <parent link="base"/>
     <child link="shoulder_link"/>
     <axis xyz="0 0 1"/>
-    <limit effort="1000" velocity="1000"/>
-    <!-- <limit effort="39" velocity="1.3963"/> -->
+    <limit effort="39" velocity="1.3963"/>
   </joint>
 
   <link name="half_arm_1_link">
@@ -69,7 +68,7 @@
     <visual>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="meshes/half_arm_1_link.obj"/>
+        <mesh filename=".\meshes\half_arm_1_link.obj"/>
       </geometry>
       <material name="">
         <color rgba="0.75294 0.75294 0.75294 1"/>
@@ -78,7 +77,7 @@
     <collision>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="meshes/half_arm_1_link.STL"/>
+        <mesh filename=".\meshes\half_arm_1_link.STL"/>
       </geometry>
     </collision>
   </link>
@@ -88,8 +87,7 @@
     <parent link="shoulder_link"/>
     <child link="half_arm_1_link"/>
     <axis xyz="0 0 1"/>
-    <limit effort="1000" velocity="1000"/>
-    <!-- <limit effort="39" lower="-2.41" upper="2.41" velocity="1.3963"/> -->
+    <limit effort="39" lower="-2.41" upper="2.41" velocity="1.3963"/>
   </joint>
 
   <link name="half_arm_2_link">
@@ -101,7 +99,7 @@
     <visual>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="meshes/half_arm_2_link.obj"/>
+        <mesh filename=".\meshes\half_arm_2_link.obj"/>
       </geometry>
       <material name="">
         <color rgba="0.75294 0.75294 0.75294 1"/>
@@ -110,7 +108,7 @@
     <collision>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="meshes/half_arm_2_link.STL"/>
+        <mesh filename=".\meshes\half_arm_2_link.STL"/>
       </geometry>
     </collision>
   </link>
@@ -120,8 +118,7 @@
     <parent link="half_arm_1_link"/>
     <child link="half_arm_2_link"/>
     <axis xyz="0 0 1"/>
-    <limit effort="1000" velocity="1000"/>
-    <!-- <limit effort="39" velocity="1.3963"/> -->
+    <limit effort="39" velocity="1.3963"/>
   </joint>
 
   <link name="forearm_link">
@@ -133,7 +130,7 @@
     <visual>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="meshes/forearm_link.obj"/>
+        <mesh filename=".\meshes\forearm_link.obj"/>
       </geometry>
       <material name="">
         <color rgba="0.75294 0.75294 0.75294 1"/>
@@ -142,7 +139,7 @@
     <collision>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="meshes/forearm_link.STL"/>
+        <mesh filename=".\meshes\forearm_link.STL"/>
       </geometry>
     </collision>
   </link>
@@ -152,8 +149,7 @@
     <parent link="half_arm_2_link"/>
     <child link="forearm_link"/>
     <axis xyz="0 0 1"/>
-    <limit effort="1000" velocity="1000"/>
-    <!-- <limit effort="39" lower="-2.66" upper="2.66" velocity="1.3963"/> -->
+    <limit effort="39" lower="-2.66" upper="2.66" velocity="1.3963"/>
   </joint>
 
   <link name="spherical_wrist_1_link">
@@ -165,7 +161,7 @@
     <visual>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="meshes/spherical_wrist_1_link.obj"/>
+        <mesh filename=".\meshes\spherical_wrist_1_link.obj"/>
       </geometry>
       <material name="">
         <color rgba="0.75294 0.75294 0.75294 1"/>
@@ -174,7 +170,7 @@
     <collision>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="meshes/spherical_wrist_1_link.STL"/>
+        <mesh filename=".\meshes\spherical_wrist_1_link.STL"/>
       </geometry>
     </collision>
   </link>
@@ -184,8 +180,7 @@
     <parent link="forearm_link"/>
     <child link="spherical_wrist_1_link"/>
     <axis xyz="0 0 1"/>
-    <limit effort="1000" velocity="1000"/>
-    <!-- <limit effort="9" velocity="1.2218"/> -->
+    <limit effort="9" velocity="1.2218"/>
   </joint>
 
   <link name="spherical_wrist_2_link">
@@ -197,7 +192,7 @@
     <visual>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="meshes/spherical_wrist_2_link.obj"/>
+        <mesh filename=".\meshes\spherical_wrist_2_link.obj"/>
       </geometry>
       <material name="">
         <color rgba="0.75294 0.75294 0.75294 1"/>
@@ -206,7 +201,7 @@
     <collision>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="meshes/spherical_wrist_2_link.STL"/>
+        <mesh filename=".\meshes\spherical_wrist_2_link.STL"/>
       </geometry>
     </collision>
   </link>
@@ -216,8 +211,7 @@
     <parent link="spherical_wrist_1_link"/>
     <child link="spherical_wrist_2_link"/>
     <axis xyz="0 0 1"/>
-    <limit effort="1000" velocity="1000"/>
-    <!-- <limit effort="9" lower="-2.23" upper="2.23" velocity="1.2218"/> -->
+    <limit effort="9" lower="-2.23" upper="2.23" velocity="1.2218"/>
   </joint>
 
   <link name="bracelet_link">
@@ -230,7 +224,7 @@
     <visual>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="meshes/bracelet_with_vision_link.obj"/>
+        <mesh filename=".\meshes\bracelet_with_vision_link.obj"/>
       </geometry>
       <material name="">
         <color rgba="0.75294 0.75294 0.75294 1"/>
@@ -239,7 +233,7 @@
     <collision>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="meshes/bracelet_with_vision_link.STL"/>
+        <mesh filename=".\meshes\bracelet_with_vision_link.STL"/>
       </geometry>
     </collision>
   </link>
@@ -249,8 +243,7 @@
     <parent link="spherical_wrist_2_link"/>
     <child link="bracelet_link"/>
     <axis xyz="0 0 1"/>
-    <limit effort="1000" velocity="1000"/>
-    <!-- <limit effort="9" velocity="1.2218"/> -->
+    <limit effort="9" velocity="1.2218"/>
   </joint>
 
 <!--
@@ -288,7 +281,7 @@
     <visual>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="meshes/base_of_gripper.obj"/>
+        <mesh filename=".\meshes\base_of_gripper.obj"/>
       </geometry>
       <material name="">
         <color rgba="0.89804 0.91765 0.92941 0.25"/>
@@ -297,7 +290,7 @@
     <collision>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="meshes/base_of_gripper.STL"/>
+        <mesh filename=".\meshes\base_of_gripper.STL"/>
       </geometry>
     </collision>
   </link>
@@ -313,7 +306,7 @@
     <visual>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="kinova-sys-id\models\mjcf\kinova3\meshes\right_spring_link.STL"/>
+        <mesh filename=".\meshes\right_spring_link.STL"/>
       </geometry>
       <material name="">
         <color rgba="0.89804 0.91765 0.92941 1"/>
@@ -322,7 +315,7 @@
     <collision>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="kinova-sys-id\models\mjcf\kinova3\meshes\right_spring_link.STL"/>
+        <mesh filename=".\meshes\right_spring_link.STL"/>
       </geometry>
     </collision>
   </link>
@@ -344,7 +337,7 @@
     <visual>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="kinova-sys-id\models\mjcf\kinova3\meshes\left_spring_link.STL"/>
+        <mesh filename=".\meshes\left_spring_link.STL"/>
       </geometry>
       <material name="">
         <color rgba="0.898039215686275 0.917647058823529 0.929411764705882 1"/>
@@ -353,7 +346,7 @@
     <collision>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="kinova-sys-id\models\mjcf\kinova3\meshes\left_spring_link.STL"/>
+        <mesh filename=".\meshes\left_spring_link.STL"/>
       </geometry>
     </collision>
   </link>
@@ -375,7 +368,7 @@
     <visual>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="kinova-sys-id\models\mjcf\kinova3\meshes\right_driver.STL"/>
+        <mesh filename=".\meshes\right_driver.STL"/>
       </geometry>
       <material name="">
         <color rgba="0.898039215686275 0.917647058823529 0.929411764705882 1"/>
@@ -384,7 +377,7 @@
     <collision>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="kinova-sys-id\models\mjcf\kinova3\meshes\right_driver.STL"/>
+        <mesh filename=".\meshes\right_driver.STL"/>
       </geometry>
     </collision>
   </link>
@@ -406,7 +399,7 @@
     <visual>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="kinova-sys-id\models\mjcf\kinova3\meshes\right_coupler.STL"/>
+        <mesh filename=".\meshes\right_coupler.STL"/>
       </geometry>
       <material name="">
         <color rgba="0.898039215686275 0.917647058823529 0.929411764705882 1"/>
@@ -415,7 +408,7 @@
     <collision>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="kinova-sys-id\models\mjcf\kinova3\meshes\right_coupler.STL"/>
+        <mesh filename=".\meshes\right_coupler.STL"/>
       </geometry>
     </collision>
   </link>
@@ -437,7 +430,7 @@
     <visual>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="kinova-sys-id\models\mjcf\kinova3\meshes\right_follower.STL"/>
+        <mesh filename=".\meshes\right_follower.STL"/>
       </geometry>
       <material name="">
         <color rgba="0.898039215686275 0.917647058823529 0.929411764705882 1"/>
@@ -446,7 +439,7 @@
     <collision>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="kinova-sys-id\models\mjcf\kinova3\meshes\right_follower.STL"/>
+        <mesh filename=".\meshes\right_follower.STL"/>
       </geometry>
     </collision>
   </link>
@@ -468,7 +461,7 @@
     <visual>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="kinova-sys-id\models\mjcf\kinova3\meshes\right_pad.STL"/>
+        <mesh filename=".\meshes\right_pad.STL"/>
       </geometry>
       <material name="">
         <color rgba="0.529411764705882 0.549019607843137 0.549019607843137 1"/>
@@ -477,7 +470,7 @@
     <collision>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="kinova-sys-id\models\mjcf\kinova3\meshes\right_pad.STL"/>
+        <mesh filename=".\meshes\right_pad.STL"/>
       </geometry>
     </collision>
   </link>
@@ -498,7 +491,7 @@
     <visual>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="kinova-sys-id\models\mjcf\kinova3\meshes\left_driver.STL"/>
+        <mesh filename=".\meshes\left_driver.STL"/>
       </geometry>
       <material name="">
         <color rgba="0.898039215686275 0.917647058823529 0.929411764705882 1"/>
@@ -507,7 +500,7 @@
     <collision>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="kinova-sys-id\models\mjcf\kinova3\meshes\left_driver.STL"/>
+        <mesh filename=".\meshes\left_driver.STL"/>
       </geometry>
     </collision>
   </link>
@@ -529,7 +522,7 @@
     <visual>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="kinova-sys-id\models\mjcf\kinova3\meshes\left_coupler.STL"/>
+        <mesh filename=".\meshes\left_coupler.STL"/>
       </geometry>
       <material name="">
         <color rgba="0.898039215686275 0.917647058823529 0.929411764705882 1"/>
@@ -538,7 +531,7 @@
     <collision>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="kinova-sys-id\models\mjcf\kinova3\meshes\left_coupler.STL"/>
+        <mesh filename=".\meshes\left_coupler.STL"/>
       </geometry>
     </collision>
   </link>
@@ -560,7 +553,7 @@
     <visual>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="kinova-sys-id\models\mjcf\kinova3\meshes\left_follower.STL"/>
+        <mesh filename=".\meshes\left_follower.STL"/>
       </geometry>
       <material name="">
         <color rgba="0.898039215686275 0.917647058823529 0.929411764705882 1"/>
@@ -569,7 +562,7 @@
     <collision>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="kinova-sys-id\models\mjcf\kinova3\meshes\left_follower.STL"/>
+        <mesh filename=".\meshes\left_follower.STL"/>
       </geometry>
     </collision>
   </link>
@@ -591,7 +584,7 @@
     <visual>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="kinova-sys-id\models\mjcf\kinova3\meshes\left_pad.STL"/>
+        <mesh filename=".\meshes\left_pad.STL"/>
       </geometry>
       <material name="">
         <color rgba="0.529411764705882 0.549019607843137 0.549019607843137 1"/>
@@ -600,7 +593,7 @@
     <collision>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="kinova-sys-id\models\mjcf\kinova3\meshes\left_pad.STL"/>
+        <mesh filename=".\meshes\left_pad.STL"/>
       </geometry>
     </collision>
   </link>
@@ -636,7 +629,7 @@
     <visual>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="meshes/plate_shifted_scaled_origin_v3.obj" />
+        <mesh filename=".\meshes\plate_shifted_scaled_origin_v3.obj" />
           <!-- scale="0.001 0.001 0.001" -->
       </geometry>
       <material name="">
@@ -646,7 +639,7 @@
     <collision>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="meshes/plate_shifted_scaled_origin_v3.STL" />
+        <mesh filename=".\meshes\plate_shifted_scaled_origin_v3.STL" />
           <!-- scale="0.001 0.001 0.001" -->
       </geometry>
     </collision>
@@ -675,7 +668,7 @@
     <visual>
       <origin rpy="0 0 0" xyz="0 0 0" />
       <geometry>
-        <mesh filename="kinova-sys-id\models\mjcf\kinova3\meshes\cube_all_corners_shifted_scaled_origin_v2.STL" />
+        <mesh filename=".\meshes\cube_all_corners_shifted_scaled_origin_v2.STL" />
       -->
           <!-- scale="0.001 0.001 0.001" -->
           <!--
@@ -687,7 +680,7 @@
     <collision>
       <origin rpy="0 0 0" xyz="0 0 0" />
       <geometry>
-        <mesh filename="kinova-sys-id\models\mjcf\kinova3\meshes\cube_all_corners_shifted_scaled_origin_v2.STL" />
+        <mesh filename=".\meshes\cube_all_corners_shifted_scaled_origin_v2.STL" />
       -->
           <!-- scale="0.001 0.001 0.001" -->
           <!--

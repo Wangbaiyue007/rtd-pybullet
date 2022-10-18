@@ -28,7 +28,6 @@ for i in range(10000):
     if i%200 == 0:
         recorder.add_keyframe()
     # time.sleep(timestep)
-#breakpoint()
 steps = np.size(joint_vel, 0) * 100
 qpos = np.zeros((steps, 7))
 qvel = np.zeros((steps, 7))
