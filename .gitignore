@@ -5,6 +5,7 @@ assets/zonotope/meshes_matlab
 assets/zonotope/meshes_zonopy
 *.asv
 .vscode
+*temp.urdf
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

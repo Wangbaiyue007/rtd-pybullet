@@ -4,9 +4,9 @@ from typing import Tuple
 import pybullet as p
 import numpy as np
 import pybullet_data
-# zonopy
 import torch
 from bullet.bulletPlanner import bulletPlanner
+import xml.etree.ElementTree as ET
 
 clid = p.connect(p.SHARED_MEMORY)
 
@@ -97,7 +97,7 @@ class bulletRtdEnv:
         if planner == 'zonopy':
             self.zonopy = bulletPlanner.Zonopy(q0=q0, qgoal=self.qgoal, obs_pos=obs_pos, obs_size=obs_size)
             for i in range(len(obs_pos)):
-                self.load("../assets/objects/cube_small_zero.urdf", pos= obs_pos[i], scale=obs_size[0]*2)
+                self.load("../assets/objects/cube_small_zero.urdf", pos= obs_pos[i], scale=obs_size[i], urdf_index=i)
         # elif planner == 'armour':
             
 
@@ -319,12 +319,17 @@ class bulletRtdEnv:
         quat = p.getQuaternionFromEuler(euler)
         return quat
 
-    def load(self, filename: str, pos: list=[0, 0, 0], ori: list=[0, 0, 0], scale: float=1, saveid: bool=True) -> Tuple[int, str]:
+    def load(self, filename: str, pos: list=[0, 0, 0], ori: list=[0, 0, 0], scale: list=[1.0], urdf_index: int=0, saveid: bool=True) -> Tuple[int, str]:
         """
         Loading an object from URDF. \n
         return: object id.
         """
-        objId = p.loadURDF(filename, globalScaling=scale)
+        if len(scale) == 1:
+            objId = p.loadURDF(filename, globalScaling=scale)
+        else:
+            filename_new = self.scale_urdf(filename, scale, urdf_index)
+            objId = p.loadURDF(filename_new)
+        
         if saveid:
             self.EnvId.append(objId)
             self.path.append(filename)
@@ -333,6 +338,24 @@ class bulletRtdEnv:
         ori = self.Euler2Quat(ori)
         p.resetBasePositionAndOrientation(objId, pos, ori)
         return objId, filename
+    
+    def scale_urdf(self, filename, scale, index) -> str:
+        """
+        Scale the urdf file by direct access. This will modify the file permanently.
+        """
+
+        assert len(scale) == 3, "Input scale should have length 3."
+        scale_str = ' '.join(str(e) for e in scale)
+        tree = ET.parse(filename)
+        root = tree.getroot()
+
+        root[0].find('visual').find('geometry')[0].set('scale', scale_str)
+        root[0].find('collision').find('geometry')[0].set('size', scale_str)
+
+        filename_new = filename+str(index)+'temp.urdf'
+        tree.write(filename_new)
+
+        return filename_new
 
     def set_obj_config(self, objId: int, objPos: np.array, objOri: np.array):
         """

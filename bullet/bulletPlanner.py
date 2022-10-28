@@ -8,22 +8,19 @@ class bulletPlanner:
             self.planner = armtd.pzsparse()
             obs_pos_np = np.array(obs_pos)
             obs_size_np = np.array(obs_size)
-            
+
 
     class Zonopy:
         def __init__(self, q0 = [0]*7, qgoal = [0]*7, obs_pos = [[]], obs_size = [], dtype = torch.float, device = 'cuda:0', debug=True):
             from zonopy.environments.arm_3d import Arm_3D
             from zonopy.optimize.armtd_3d import ARMTD_3D_planner
 
-            obs_size_max = obs_size*3
-            obs_size_min = obs_size*3
-            self.arm3d = Arm_3D(robot="Kinova3", n_obs=len(obs_pos), \
-                 obs_size_max=obs_size_max, obs_size_min=obs_size_min, FO_render_freq=25, goal_threshold=0.1)
+            self.arm3d = Arm_3D(robot="Kinova3", n_obs=len(obs_pos), FO_render_freq=25, goal_threshold=0.1)
             q = torch.tensor(q0, dtype=dtype, device=device)
             qd = torch.zeros(self.arm3d.n_links, dtype=dtype, device=device)
             qgoal = torch.tensor(qgoal, dtype=dtype, device=device)
             obs_pos = torch.tensor(obs_pos, dtype=dtype, device=device)
-            obs_size = [torch.tensor(obs_size_max,dtype=dtype,device=device) for _ in range(len(obs_pos))]
+            obs_size = torch.tensor(obs_size,dtype=dtype,device=device) / 2
             self.arm3d.set_initial(q, qd, qgoal, obs_pos, obs_size)
             self.planner = ARMTD_3D_planner(self.arm3d, dtype=dtype, device=device)
             self.ka_0 = torch.zeros(self.arm3d.dof)
