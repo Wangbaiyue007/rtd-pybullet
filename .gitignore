@@ -4,6 +4,7 @@ data/ARMTD_zonopy/zonopy_sim
 assets/zonotope/meshes_matlab
 assets/zonotope/meshes_zonopy
 *.asv
+.vscode
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
