@@ -6,8 +6,7 @@ import numpy as np
 import pybullet_data
 # zonopy
 import torch
-from zonopy.environments.arm_3d import Arm_3D
-from zonopy.optimize.armtd_3d import ARMTD_3D_planner
+from bullet.bulletPlanner import bulletPlanner
 
 clid = p.connect(p.SHARED_MEMORY)
 
@@ -23,7 +22,7 @@ class bulletRtdEnv:
         useGravity=True, 
         useRobot=True, 
         useTorqueControl=True,
-        useZonopy=False,
+        planner=None,
         q0 = [0]*7, 
         qgoal = [0]*7, 
         obs_pos = [[]],
@@ -95,10 +94,13 @@ class bulletRtdEnv:
         self.obs_pos = obs_pos
         self.obs_size = obs_size
         self.forwardkinematics(q0)
-        if useZonopy:
-            self.zonopy = self.Zonopy(q0=q0, qgoal=self.qgoal, obs_pos=obs_pos, obs_size=obs_size)
+        if planner == 'zonopy':
+            self.zonopy = bulletPlanner.Zonopy(q0=q0, qgoal=self.qgoal, obs_pos=obs_pos, obs_size=obs_size)
             for i in range(len(obs_pos)):
                 self.load("../assets/objects/cube_small_zero.urdf", pos= obs_pos[i], scale=obs_size[0]*2)
+        # elif planner == 'armour':
+            
+
 
     def step(self, ka, qpos=[], qvel=[]):
         """
@@ -170,24 +172,7 @@ class bulletRtdEnv:
             qacc, done = self.zonopy.step()
             self.zonopy.arm3d.render()
             self.step(qacc)
-            # minimize goal position error
-            '''
-            if point == len(waypoints) -1:
-                print("\nApproaching goal...\n")
-                index = 0
-                self.qpos_e = np.zeros(7)
-                while True:
-                    info = self.local_attractor(self.goal_pos, index)
-                    index += 1
-                    collision = info['collision']
-                    qpos, qvel = self._get_state()
-                    if precise_goal and (self.goal_distance(qpos, self.goal_pos) < 0.02 and np.linalg.norm(qvel) < 0.005): 
-                        success = True
-                        break
-                    if (not precise_goal) and (self.goal_distance(qpos, self.goal_pos) < 0.1 and np.linalg.norm(qvel) < 0.1):
-                        success = True
-                        break
-            '''
+            # TODO: minimize goal position error
                 
         return done
 
@@ -405,79 +390,3 @@ class bulletRtdEnv:
 
     def Disconnect(self):
         p.disconnect()
-
-    class Zonopy:
-
-        def __init__(self, q0 = [0]*7, qgoal = [0]*7, obs_pos = [[]], obs_size = [], dtype = torch.float, device = 'cuda:0'):
-            obs_size_max = obs_size*3
-            obs_size_min = obs_size*3
-            self.arm3d = Arm_3D(robot="Kinova3", n_obs=len(obs_pos), \
-                 obs_size_max=obs_size_max, obs_size_min=obs_size_min, FO_render_freq=25, goal_threshold=0.1)
-            q = torch.tensor(q0, dtype=dtype, device=device)
-            qd = torch.zeros(self.arm3d.n_links, dtype=dtype, device=device)
-            qgoal = torch.tensor(qgoal, dtype=dtype, device=device)
-            obs_pos = torch.tensor(obs_pos, dtype=dtype, device=device)
-            obs_size = [torch.tensor(obs_size_max,dtype=dtype,device=device) for _ in range(len(obs_pos))]
-            self.arm3d.set_initial(q, qd, qgoal, obs_pos, obs_size)
-            self.planner = ARMTD_3D_planner(self.arm3d, dtype=dtype, device=device)
-            self.ka_0 = torch.zeros(self.arm3d.dof)
-            self.ka = torch.zeros(self.arm3d.dof)
-
-        def step(self):
-            
-            if self.debug:
-                print(f"Iteration {iter}")
-            ka, flag = self.planner.plan(self.arm3d, self.ka_0)
-            ka_break = (-self.arm3d.qvel) / 0.5
-
-            if self.debug:
-                print(f"qvel_prestep: {self.arm3d.qvel}")
-            observations, reward, done, info = self.arm3d.step(ka.cpu(), flag)
-            if self.debug:
-                print(f"qvel_poststep: {self.arm3d.qvel}")
-
-            safe = self.arm3d.safe
-            if safe:
-                if self.debug:
-                    print("--safe move--")
-                qacc = ka.cpu()
-            else:
-                if self.debug:
-                    print("--safe break--")
-                qacc = ka_break.cpu()
-            if self.debug:
-                print(f"qacc: {qacc}")
-
-            return qacc, done
-
-        def step_hardware(self, qpos_hardware, qvel_hardware):
-            # correct env state using hardware data
-            self.arm3d.qpos = qpos_hardware
-            self.arm3d.qvel = qvel_hardware
-
-            # plan for the future 0.5 sec, which should be used for the next step
-            ka, flag = self.planner.plan_hardware(self.arm3d, self.ka_0, self.ka)
-            print(ka)
-            ka_break = (-self.arm3d.qvel) / 0.5
-
-            # step the previous plan in the zonopy environment
-            observations, reward, done, info = self.arm3d.step(self.ka.cpu(), flag)
-
-            # fail save manuvoir
-            safe = self.arm3d.safe
-            if safe:
-                print("--safe move--")
-                qacc = ka.cpu()
-            else:
-                print("--safe break--")
-                qacc = ka_break.cpu()
-            # print(f"qacc: {qacc}")
-
-            # Update the plan
-            self.ka_pre = self.ka
-            self.ka = qacc
-
-            return qacc, done
-
-        def saturation(self, ka):
-            return 
