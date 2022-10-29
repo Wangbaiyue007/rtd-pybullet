@@ -1,13 +1,31 @@
 import torch
 import numpy as np
 
+
 class bulletPlanner:
     class ARMOUR:
-        def __init__(self, obs_pos, obs_size):
-            import armtd_main_pybind as armtd
-            self.planner = armtd.pzsparse()
+        def __init__(self):
+            import armtd_main_pybind
+            self.planner = armtd_main_pybind.pzsparse()
+
+        def stack_obstacles(self, obs_pos, obs_size):
+            """
+            Stacking obstacles information to be armour input
+            """
             obs_pos_np = np.array(obs_pos)
             obs_size_np = np.array(obs_size)
+            obs_size_stack = np.empty([1,9])
+            for size in obs_size_np:
+                obs_size_stack = np.concatenate([obs_size_stack, (size*np.eye(3)).reshape(1,9)], axis=0)
+            obs_size_stack = obs_size_stack[1:]
+            obs_stack = np.concatenate([obs_pos_np, obs_size_stack], axis=1)
+
+            return obs_stack
+        
+        def plan(self, q0, qd0, qdd0, goal, obs_pos, obs_size):
+            obstacles = self.stack_obstacles(obs_pos, obs_size)
+            k_opt = self.planner.optimize(q0, qd0, qdd0, goal, obstacles)
+            return k_opt
 
 
     class Zonopy:
