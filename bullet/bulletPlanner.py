@@ -25,6 +25,8 @@ class bulletPlanner:
         def plan(self, q0, qd0, qdd0, goal, obs_pos, obs_size):
             obstacles = self.stack_obstacles(obs_pos, obs_size)
             k_opt = self.planner.optimize(q0, qd0, qdd0, goal, obstacles)
+            if np.linalg.norm(k_opt) == 0:
+                k_opt = qd0 / 0.5
             return k_opt
 
 

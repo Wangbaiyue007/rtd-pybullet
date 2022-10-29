@@ -113,8 +113,6 @@ class bulletRtdEnv:
             self.planner_agent.arm3d.render()
         elif self.planner_name == 'armour':
             qacc = self.planner_agent.plan(q0=self.qpos_sim, qd0=self.qvel_sim, qdd0=self.qacc_sim, goal=goal, obs_pos=self.obs_pos, obs_size=self.obs_size)
-            if np.linalg.norm(qacc) == 0:
-                qacc = self.qvel_sim / 0.5
             # TODO: done
             done = False
 
@@ -128,9 +126,6 @@ class bulletRtdEnv:
 
         if len(qpos) == 0 and len(qvel) == 0:
             qpos, qvel = self.get_joint_states()
-            self.qacc_sim = (qvel - self.qvel_sim) / self.timestep
-            self.qpos_sim = qpos
-            self.qvel_sim = qvel
 
         for i in range(steps):
             # calculate desired trajectory
@@ -140,6 +135,11 @@ class bulletRtdEnv:
             self.torque_control(torque)
             p.stepSimulation()
             time.sleep(self.timestep)
+            # update states
+            qpos_sim, qvel_sim = self.get_joint_states()
+            self.qacc_sim = (qvel_sim - self.qvel_sim) / self.timestep
+            self.qpos_sim = qpos_sim
+            self.qvel_sim = qvel_sim
     
     def step_hardware(self, ka, ka_pre, qpos_d=[], qvel_d=[]):
         """
@@ -162,7 +162,7 @@ class bulletRtdEnv:
 
     def rrt(self, goal_pos=[]):
         """
-        RRT algorithm that builds waypoints.
+        RRT algorithm that builds waypoints
         """
         start_pos, _ = self.get_joint_states()
         self.goal_pos = np.array(goal_pos)
@@ -176,9 +176,22 @@ class bulletRtdEnv:
             rrt_builder.backtrace()
             rrt_builder.shortcut_smoothing()
             waypoints = rrt_builder.solution
+            self.plot_waypoints(waypoints)
             return waypoints, success
         else:
             return 0, False
+
+    def plot_waypoints(self, waypoints: List[Node]):
+        """
+        Plot waypoints in the environment
+        """
+        for node in waypoints:
+            joint_node = node.pos
+            euclidean_node = self.forwardkinematics(joint_node)
+            p.addUserDebugPoints(pointPositions=[euclidean_node[0:3].tolist()], pointColorsRGB=[[0.2, 0.2, 1.0]], pointSize=10)  
+
+        # return to the start position
+        self.forwardkinematics(self.qpos_sim)
 
     def _armtd_track(self, waypoints: List[Node]):
         """
@@ -287,7 +300,7 @@ class bulletRtdEnv:
             jointPoses = p.calculateInverseKinematics(self.robotId, self.EndEffectorIndex, pos, self.ll, self.ul, self.jr, self.rp)
         return jointPoses
 
-    def forwardkinematics(self, qpos: np.array) -> np.array:
+    def forwardkinematics(self, qpos: np.ndarray) -> np.ndarray:
         """
         Force set the joint positions of actuated joints. \n
         return: position and orientation of the end effector.
