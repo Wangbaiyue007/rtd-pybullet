@@ -22,12 +22,20 @@ class bulletPlanner:
 
             return obs_stack
         
-        def plan(self, q0, qd0, qdd0, goal, obs_pos, obs_size):
+        def plan(self, q0: np.ndarray, qd0: np.ndarray, qdd0: np.ndarray, goal: np.ndarray, obs_pos: np.ndarray, obs_size: np.ndarray):
+            """
+            Return Berenstein coefficients
+            """
             obstacles = self.stack_obstacles(obs_pos, obs_size)
             k_opt = self.planner.optimize(q0, qd0, qdd0, goal, obstacles)
-            if np.linalg.norm(k_opt) == 0:
-                k_opt = qd0 / 0.5
             return k_opt
+
+        def get_des_traj(self, q0: np.ndarray, qd0: np.ndarray, qdd0: np.ndarray, k:np.ndarray, t: float) -> np.ndarray:
+            """
+            Generate desired trajectory of the Bezier curve, returns a 7 by 3 matrix [q, qd, qdd]
+            """
+            qdes = self.planner.getDesTraj(q0, qd0, qdd0, k, t)
+            return qdes.reshape(7,3)
 
 
     class Zonopy:

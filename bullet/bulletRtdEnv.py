@@ -105,18 +105,18 @@ class bulletRtdEnv:
             
     def armtd_plan(self, goal: np.ndarray):
         """
-        Plan for 1 planning iteration of ARMTD/ARMOUR
+        Plan for 1 planning iteration of ARMTD
         """
         if self.planner_name == 'zonopy':
             self.planner_agent.arm3d.qgoal = torch.tensor(goal, dtype=self.planner_agent.arm3d.dtype, device=self.planner_agent.arm3d.device)
-            qacc, done = self.planner_agent.step()
+            k, done = self.planner_agent.step()
             self.planner_agent.arm3d.render()
         elif self.planner_name == 'armour':
-            qacc = self.planner_agent.plan(q0=self.qpos_sim, qd0=self.qvel_sim, qdd0=self.qacc_sim, goal=goal, obs_pos=self.obs_pos, obs_size=self.obs_size)
+            k = self.planner_agent.plan(q0=self.qpos_sim, qd0=self.qvel_sim, qdd0=self.qacc_sim, goal=goal, obs_pos=self.obs_pos, obs_size=self.obs_size)
             # TODO: done
             done = False
 
-        return qacc, done
+        return k, done
 
     def step(self, ka: np.ndarray, qpos=[], qvel=[]):
         """
@@ -126,12 +126,19 @@ class bulletRtdEnv:
 
         if len(qpos) == 0 and len(qvel) == 0:
             qpos, qvel = self.get_joint_states()
+            qacc = (qvel - self.qvel_sim) / self.timestep
+            self.qacc_sim = qacc
 
         for i in range(steps):
-            # calculate desired trajectory
-            qpos, qvel = self.get_joint_traj(qpos, qvel, ka)
-            # inverse dynamics controller
-            torque = self.inversedynamics(qpos, qvel, ka)
+            if self.planner_name == 'zonopy':
+                # calculate desired trajectory: linear function
+                qpos, qvel = self.get_joint_traj(qpos, qvel, ka)
+                torque = self.inversedynamics(qpos, qvel, ka)
+            elif self.planner_name == 'armour':
+                # calculate desired trajectory: Bezier curve
+                t = self.timestep * i
+                qdes = self.planner_agent.get_des_traj(q0=qpos, qd0=qvel, qdd0=qacc, k=ka, t=t)
+                torque = self.inversedynamics(qdes[:,0], qdes[:,1], qdes[:,2])
             self.torque_control(torque)
             p.stepSimulation()
             time.sleep(self.timestep)
@@ -200,8 +207,8 @@ class bulletRtdEnv:
         for point in range(len(waypoints)):
             print("point: ", point)
             waypoint = waypoints[point]
-            qacc, done = self.armtd_plan(waypoint.pos)
-            self.step(qacc)
+            k, done = self.armtd_plan(waypoint.pos)
+            self.step(k)
             # TODO: minimize goal position error
                 
         return done
