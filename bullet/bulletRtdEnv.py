@@ -183,6 +183,7 @@ class bulletRtdEnv:
             rrt_builder.backtrace()
             rrt_builder.shortcut_smoothing()
             waypoints = rrt_builder.solution
+            waypoints = waypoints[0::4]
             self.plot_waypoints(waypoints)
             return waypoints, success
         else:

@@ -19,3 +19,4 @@ btZonopy = bulletRtdEnv(urdf_path=urdf_path, zonopyGUI=useGUI, useGravity=useGra
     q0=q0, qgoal=qgoal, obs_pos=obs_pos, obs_size=obs_size)
 
 btZonopy.simulate(qgoal)
+breakpoint()
