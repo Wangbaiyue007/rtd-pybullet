@@ -208,8 +208,9 @@ class bulletRtdEnv:
         for point in range(len(waypoints)):
             print("point: ", point)
             waypoint = waypoints[point]
-            k, done = self.armtd_plan(waypoint.pos)
-            self.step(k)
+            for _ in range(2):
+                k, done = self.armtd_plan(waypoint.pos)
+                self.step(k)
             # TODO: minimize goal position error
                 
         return done

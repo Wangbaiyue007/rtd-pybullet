@@ -26,8 +26,8 @@ class bulletPlanner:
             """
             Return Berenstein coefficients
             """
-            obstacles = self.stack_obstacles(obs_pos, obs_size)
-            k_opt = self.planner.optimize(q0, qd0, qdd0, goal, obstacles)
+            obstacles = self.stack_obstacles(obs_pos, obs_size / 2)
+            k_opt = self.planner.optimize(q0, qd0, goal, goal, obstacles)
             return k_opt
 
         def get_des_traj(self, q0: np.ndarray, qd0: np.ndarray, qdd0: np.ndarray, k:np.ndarray, t: float) -> np.ndarray:
