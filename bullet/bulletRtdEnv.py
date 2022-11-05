@@ -110,21 +110,6 @@ class bulletRtdEnv:
         elif planner == 'armour':
             self.zonopy = bulletPlanner.Zonopy(q0=q0, qgoal=self.qgoal, obs_pos=obs_pos, obs_size=obs_size)
             self.planner_agent = bulletPlanner.ARMOUR()
-            
-    def armtd_plan(self, goal: np.ndarray):
-        """
-        Plan for 1 planning iteration of ARMTD
-        """
-        if self.planner_name == 'zonopy':
-            self.planner_agent.arm3d.qgoal = torch.tensor(goal, dtype=self.planner_agent.arm3d.dtype, device=self.planner_agent.arm3d.device)
-            k, done = self.planner_agent.step()
-            self.planner_agent.arm3d.render()
-        elif self.planner_name == 'armour':
-            k = self.planner_agent.plan(q0=self.qpos_sim, qd0=self.qvel_sim, qdd0=self.qacc_sim, goal=goal, obs_pos=self.obs_pos, obs_size=self.obs_size)
-            # TODO: done
-            done = False
-
-        return k, done
 
     def step(self, ka: np.ndarray, qpos=[], qvel=[]):
         """
@@ -162,25 +147,6 @@ class bulletRtdEnv:
                 self.qpos_record = np.append(self.qpos_record, np.array([qpos_sim]), axis=0)
                 self.qvel_record = np.append(self.qvel_record, np.array([qvel_sim]), axis=0)
                 self.qacc_record = np.append(self.qacc_record, np.array([self.qacc_sim]), axis=0)
-    
-    def step_hardware(self, ka, ka_pre, qpos_d=[], qvel_d=[]):
-        """
-        Step for 1 planning iteration (0.5 s) in pybullet
-        """
-        ka = ka.numpy()
-        steps = int(0.5/self.timestep)
-
-        if len(qpos_d) == 0 and len(qvel_d) == 0:
-            qpos_d, qvel_d = self.get_joint_states()
-
-        for i in range(steps):
-            # calculate desired trajectory
-            qpos_d, qvel_d = self.get_joint_traj(qpos_d, qvel_d, ka)
-            # inverse dynamics controller
-            torque = self.inversedynamics(qpos_d, qvel_d, ka)
-            self.torque_control(torque)
-            p.stepSimulation()
-            # time.sleep(self.timestep)
 
     def rrt(self, goal_pos=[]):
         """
@@ -215,6 +181,21 @@ class bulletRtdEnv:
 
         # return to the start position
         self.forwardkinematics(self.qpos_sim)
+
+    def armtd_plan(self, goal: np.ndarray):
+        """
+        Plan for 1 planning iteration of ARMTD
+        """
+        if self.planner_name == 'zonopy':
+            self.planner_agent.arm3d.qgoal = torch.tensor(goal, dtype=self.planner_agent.arm3d.dtype, device=self.planner_agent.arm3d.device)
+            k, done = self.planner_agent.step()
+            self.planner_agent.arm3d.render()
+        elif self.planner_name == 'armour':
+            k = self.planner_agent.plan(q0=self.qpos_sim, qd0=self.qvel_sim, qdd0=self.qacc_sim, goal=goal, obs_pos=self.obs_pos, obs_size=self.obs_size)
+            # TODO: done
+            done = False
+
+        return k, done
 
     def _armtd_track(self, waypoints: List[Node]):
         """
