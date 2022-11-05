@@ -25,6 +25,7 @@ class bulletRtdEnv:
         useRobot=True, 
         useTorqueControl=True,
         planner=None,
+        record=False,
         q0 = [0]*7, 
         qgoal = [0]*7, 
         obs_pos = [[]],
@@ -94,6 +95,13 @@ class bulletRtdEnv:
         self.qpos_sim = q0
         self.qvel_sim = np.zeros(7)
         self.qacc_sim = np.zeros(7)
+        self.record = record
+        self.qpos_record = np.array([q0])
+        self.qvel_record = np.array([np.zeros(7)])
+        self.qacc_record = np.array([np.zeros(7)])
+        self.qpos_des_record = np.array([q0])
+        self.qvel_des_record = np.array([np.zeros(7)])
+        self.qacc_des_record = np.array([np.zeros(7)])
         self.planner_name = planner
 
         if planner == 'zonopy':
@@ -147,6 +155,13 @@ class bulletRtdEnv:
             self.qacc_sim = (qvel_sim - self.qvel_sim) / self.timestep
             self.qpos_sim = qpos_sim
             self.qvel_sim = qvel_sim
+            if self.record:
+                self.qpos_des_record = np.append(self.qpos_des_record, np.array([qdes[:,0]]), axis=0)
+                self.qvel_des_record = np.append(self.qvel_des_record, np.array([qdes[:,1]]), axis=0)
+                self.qacc_des_record = np.append(self.qacc_des_record, np.array([qdes[:,2]]), axis=0)
+                self.qpos_record = np.append(self.qpos_record, np.array([qpos_sim]), axis=0)
+                self.qvel_record = np.append(self.qvel_record, np.array([qvel_sim]), axis=0)
+                self.qacc_record = np.append(self.qacc_record, np.array([self.qacc_sim]), axis=0)
     
     def step_hardware(self, ka, ka_pre, qpos_d=[], qvel_d=[]):
         """
@@ -238,9 +253,9 @@ class bulletRtdEnv:
         """
         Simulate process of rrt + armtd
         """
-        waypoints, success = self.rrt(goal_pos=goal_pos)
+        self.waypoints, success = self.rrt(goal_pos=goal_pos)
         if success:
-            self._armtd_track(waypoints)
+            self._armtd_track(self.waypoints)
         else:
             sys.exit("RRT failed to build tree.")
 
