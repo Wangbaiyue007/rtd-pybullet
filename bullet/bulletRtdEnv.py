@@ -16,7 +16,7 @@ class bulletRtdEnv:
 
     def __init__(
         self, 
-        urdf_path="../assets/fetch/fetch.urdf", 
+        urdf_path="../assets", 
         bulletGUI=True, 
         zonopyGUI=True,
         timestep=0.001, 
@@ -52,7 +52,7 @@ class bulletRtdEnv:
 
         self.EnvId = []
         if useRobot:
-            self.robotId = p.loadURDF(urdf_path, [0, 0, 0], useFixedBase=True)
+            self.robotId = p.loadURDF(urdf_path+'/kinova_gen3_7dof/kinova_with_robotiq_85.urdf', [0, 0, 0], useFixedBase=True)
             self.EnvId = [self.robotId]
 
             # choose the end effector tool frame as end effector index
@@ -78,12 +78,12 @@ class bulletRtdEnv:
             self.Kp[i, i] = control_gain*(1-0.15*i)
             self.Kd[i, i] = 1.3*(self.Kp[i, i]/2)**0.5
 
-        self.path = [urdf_path]
+        self.path = [urdf_path+'/kinova_gen3_7dof/kinova_with_robotiq_85.urdf']
         self.scale = [[1, 1, 1]]
 
         # load obstacles
         for i in range(len(obs_pos)):
-            self.load("../assets/objects/cube_small_zero.urdf", pos= obs_pos[i], scale=obs_size[i], urdf_index=i)
+            self.load(urdf_path+"/objects/cube_small_zero.urdf", pos= obs_pos[i], scale=obs_size[i], urdf_index=i)
 
         ############################## planner #############################
         # initialize planner and its environment
@@ -109,7 +109,14 @@ class bulletRtdEnv:
             self.planner_agent = bulletPlanner.Zonopy(q0=q0, qgoal=self.qgoal, obs_pos=obs_pos, obs_size=obs_size)
         elif planner == 'armour':
             self.zonopy = bulletPlanner.Zonopy(q0=q0, qgoal=self.qgoal, obs_pos=obs_pos, obs_size=obs_size)
-            self.planner_agent = bulletPlanner.ARMOUR()
+            self.initialize_armour()
+
+
+    def initialize_armour(self):
+        self.planner_agent = bulletPlanner.ARMOUR(obs_pos=self.obs_pos, obs_size=self.obs_size)
+
+    def initialize_zonopy(self, qpos, qgoal, obs_pos, obs_size):
+        self.planner_agent = self.planner_agent(q0=qpos, qgoal=qgoal, obs_pos=obs_pos, obs_size=obs_size)
 
     def step(self, ka: np.ndarray, qpos=[], qvel=[]):
         """
@@ -134,7 +141,7 @@ class bulletRtdEnv:
                 torque = self.inversedynamics(qdes[:,0], qdes[:,1], qdes[:,2])
             self.torque_control(torque)
             p.stepSimulation()
-            time.sleep(self.timestep)
+            # time.sleep(self.timestep)
             # update states
             qpos_sim, qvel_sim = self.get_joint_states()
             self.qacc_sim = (qvel_sim - self.qvel_sim) / self.timestep
@@ -148,7 +155,7 @@ class bulletRtdEnv:
                 self.qvel_record = np.append(self.qvel_record, np.array([qvel_sim]), axis=0)
                 self.qacc_record = np.append(self.qacc_record, np.array([self.qacc_sim]), axis=0)
 
-    def rrt(self, goal_pos=[]):
+    def rrt(self, goal_pos=[]) -> Tuple[List[Node], bool]:
         """
         RRT algorithm that builds waypoints
         """
@@ -191,7 +198,7 @@ class bulletRtdEnv:
             k, done = self.planner_agent.step()
             self.planner_agent.arm3d.render()
         elif self.planner_name == 'armour':
-            k = self.planner_agent.plan(q0=self.qpos_sim, qd0=self.qvel_sim, qdd0=self.qacc_sim, goal=goal, obs_pos=self.obs_pos, obs_size=self.obs_size)
+            k = self.planner_agent.plan(q0=self.qpos_sim, qd0=self.qvel_sim, qdd0=self.qacc_sim, goal=goal)
             # TODO: done
             done = False
 
@@ -235,6 +242,7 @@ class bulletRtdEnv:
         Simulate process of rrt + armtd
         """
         self.waypoints, success = self.rrt(goal_pos=goal_pos)
+        del self.zonopy
         if success:
             self._armtd_track(self.waypoints)
         else:
@@ -324,9 +332,6 @@ class bulletRtdEnv:
         ori = np.array(p.getEulerFromQuaternion(ls[1]))
 
         return np.append(pos, ori)
-
-    def initialize_zonopy(self, qpos, qgoal, obs_pos, obs_size):
-        self.planner_agent = self.planner_agent(q0=qpos, qgoal=qgoal, obs_pos=obs_pos, obs_size=obs_size)
     
     def inversedynamics(self, qpos_des, qvel_des, qacc_des: np.array) -> np.array:
         """

@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 from bullet.bulletRtdEnv import bulletRtdEnv
 
 # initialize environment
-urdf_path="../assets/kinova_gen3_7dof/kinova_with_robotiq_85.urdf"
+urdf_path="../assets"
 useGUI=True
 useGravity=True
 useRobot=True
