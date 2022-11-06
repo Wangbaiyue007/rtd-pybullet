@@ -23,7 +23,7 @@ joint_pos = np.genfromtxt('data\ARMTD_force\ARMTD_Force_w_Kinova_Success_pos.csv
 joint_vel = np.genfromtxt('data\ARMTD_force\ARMTD_Force_w_Kinova_Success_vel.csv', delimiter=',')
 joint_acc = np.genfromtxt('data\ARMTD_force\ARMTD_Force_w_Kinova_Success_accel.csv', delimiter=',')
 # loading object to place on the tray
-kinova_env.load("../assets/objects/cube_small.urdf", pos=[-1.127055022922495, -0.024827098925242, 0.32], ori=[0, 0, 0], scale=0.05) # center of the tray
+kinova_env.load("../assets/objects/cube_small.urdf", pos=[-1.127055022922495, -0.024827098925242, 0.31515], ori=[0, 0, 0], scale=0.05) # position of COM of cube, so add half the height of the cube (0.3151)
 #obstacle_pos = np.genfromtxt('../data/ARMTD_zonopy/zonopy_obstacles.csv', delimiter=',')
 #path_to_zono = '../zonotope/meshes/'
 #files_zono = os.listdir(path_to_zono)
