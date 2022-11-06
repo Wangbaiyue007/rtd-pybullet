@@ -1,33 +1,33 @@
 import torch
 import numpy as np
 
+def stack_obstacles(obs_pos, obs_size):
+    """
+    Stacking obstacles information to be armour input
+    """
+    obs_pos_np = np.array(obs_pos)
+    obs_size_np = np.array(obs_size)
+    obs_size_stack = np.empty([1,9])
+    for size in obs_size_np:
+        obs_size_stack = np.concatenate([obs_size_stack, (size*np.eye(3)).reshape(1,9)], axis=0)
+    obs_size_stack = obs_size_stack[1:]
+    obs_stack = np.concatenate([obs_pos_np, obs_size_stack], axis=1)
+
+    return obs_stack
 
 class bulletPlanner:
+
     class ARMOUR:
-        def __init__(self):
+        def __init__(self, obs_pos, obs_size):
             import armtd_main_pybind
-            self.planner = armtd_main_pybind.pzsparse()
-
-        def stack_obstacles(self, obs_pos, obs_size):
-            """
-            Stacking obstacles information to be armour input
-            """
-            obs_pos_np = np.array(obs_pos)
-            obs_size_np = np.array(obs_size)
-            obs_size_stack = np.empty([1,9])
-            for size in obs_size_np:
-                obs_size_stack = np.concatenate([obs_size_stack, (size*np.eye(3)).reshape(1,9)], axis=0)
-            obs_size_stack = obs_size_stack[1:]
-            obs_stack = np.concatenate([obs_pos_np, obs_size_stack], axis=1)
-
-            return obs_stack
+            obs_stack = stack_obstacles(obs_pos=obs_pos, obs_size=obs_size)
+            self.planner = armtd_main_pybind.pzsparse(obs_stack)
         
-        def plan(self, q0: np.ndarray, qd0: np.ndarray, qdd0: np.ndarray, goal: np.ndarray, obs_pos: np.ndarray, obs_size: np.ndarray):
+        def plan(self, q0: np.ndarray, qd0: np.ndarray, qdd0: np.ndarray, goal: np.ndarray):
             """
             Return Berenstein coefficients
             """
-            obstacles = self.stack_obstacles(obs_pos, obs_size / 2)
-            k_opt = self.planner.optimize(q0, qd0, qdd0, goal, obstacles)
+            k_opt = self.planner.optimize(q0, qd0, qdd0, goal)
             return k_opt
 
         def get_des_traj(self, q0: np.ndarray, qd0: np.ndarray, qdd0: np.ndarray, k:np.ndarray, t: float) -> np.ndarray:
