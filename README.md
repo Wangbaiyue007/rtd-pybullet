@@ -14,7 +14,7 @@ Running RTD ([Autonomous Reachability-based Manipulator Trajectory Design](https
 Please visit the following links and be sure to install all of the dependencies:
 - [`pybullet`](https://github.com/bulletphysics/bullet3)([documentation](https://pybullet.org/wordpress/index.php/forum-2/))
 - [`zonopy`](https://github.com/roahmlab/zonopy)
--[`pybullet-blender-recorder`](https://github.com/huy-ha/pybullet-blender-recorder)
+- [`pybullet-blender-recorder`](https://github.com/huy-ha/pybullet-blender-recorder)
 
 ### Intall `rtd-pybullet`
     git clone https://github.com/roahmlab/rtd-pybullet
