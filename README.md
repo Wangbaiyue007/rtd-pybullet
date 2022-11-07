@@ -1,6 +1,12 @@
 # rtd-pybullet
 Running ARMTD ([Autonomous Reachability-based Manipulator Trajectory Design](https://arxiv.org/abs/2002.01591)) in various platforms and simulate in pybullet, and create rendered animation.
 
+## Installation and Dependencies
+- At the root folder, run `pip install -e .` to set up the package.
+- The physics engine of the smulation is [Bullet](https://github.com/bulletphysics/bullet3). For more information, check out their [documentation](https://pybullet.org/wordpress/index.php/forum-2/).
+- The rendering part of this project is using [pybullet_blender_recorder](https://github.com/huy-ha/pybullet-blender-recorder). Please check out their instructions before doing rendering.
+- [Zonopy](https://github.com/kwonyos/zonopy) is a new python package to calculate rechable sets and render simulations. It is cloned as a submodule in this repo. This is where the Kinova obstacle avoidance task is generated from.
+
 ## Examples
 ### Kinova obstacle avoidance using ARMTD
 <p align="center">
@@ -16,12 +22,6 @@ Running ARMTD ([Autonomous Reachability-based Manipulator Trajectory Design](htt
 Go to `scripts/` and run `test_bullet_zonopy.py` to see what happens.
 
 ## Rendering trajectory and zonotopes
-### 0. Notes
-- At the root folder, run `pip install -e .` to set up the package.
-- The physics engine of the smulation is [Bullet](https://github.com/bulletphysics/bullet3). For more information, check out their [documentation](https://pybullet.org/wordpress/index.php/forum-2/).
-- The rendering part of this project is using [pybullet_blender_recorder](https://github.com/huy-ha/pybullet-blender-recorder). Please check out their instructions before doing rendering.
-- [Zonopy](https://github.com/kwonyos/zonopy) is a new python package to calculate rechable sets and render simulations. It is cloned as a submodule in this repo. This is where the Kinova obstacle avoidance task is generated from.
-
 ### I. Running zonopy simulation and record data
 Zonopy environment will generate an obstacle avoidance task, where a Kinova arm starts from a random position moves towards a random goal positions, with random obstacles around. Run `scripts/test_zonopy.py` to see what happens.
 
