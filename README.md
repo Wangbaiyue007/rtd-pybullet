@@ -3,8 +3,8 @@ Running ARMTD ([Autonomous Reachability-based Manipulator Trajectory Design](htt
 
 <table>
   <tr>
-    <td><img src="data/gif/kinova_obstacle_avoidance.gif?raw=true" width="200"></td>
-    <td><img src="data/gif/fetch_force_closure.gif?raw=true" width="200"></td>
+    <td><img src="data/gif/kinova_obstacle_avoidance.gif?raw=true" width="400"></td>
+    <td><img src="data/gif/fetch_force_closure.gif?raw=true" width="400"></td>
   </tr>
 </table>
 
