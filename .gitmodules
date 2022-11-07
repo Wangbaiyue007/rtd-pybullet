@@ -3,4 +3,4 @@
 	url = git@github.com:roahmlab/zonopy.git
 [submodule "armtd-dev"]
 	path = armtd-dev
-	url = git@github.com:jmichaux/armtd-dev.git
+	url = git@github.com:roahmlab/armtd-dev.git
