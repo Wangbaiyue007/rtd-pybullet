@@ -43,7 +43,7 @@ Make sure Blender is installed
 <p/> -->
 
 ## Examples
-Go to `scripts/` and run `test_bullet_zonopy.py` to see what happens.
+Go to `scripts/` and run `test_bullet_planner.py` to see what happens.
 
 ## Rendering trajectory and zonotopes
 ### I. Running zonopy simulation and record data
