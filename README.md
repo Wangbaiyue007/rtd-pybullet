@@ -24,6 +24,7 @@ Make sure Blender is installed
 ### Install `rtd-pybullet`
     git clone https://github.com/roahmlab/rtd-pybullet
     cd rtd-pybullet
+    git submodule update --init --recursive
     pip install -e .
 
 <!-- ### Install `pybullet -->
