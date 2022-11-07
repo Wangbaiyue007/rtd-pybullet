@@ -9,6 +9,8 @@ Running RTD ([Autonomous Reachability-based Manipulator Trajectory Design](https
 </table>
 
 ## Installation
+It would be a good idea to create a virtual environment, using either [`conda`](https://docs.conda.io/en/latest/) or [`venv`](https://docs.python.org/3/library/venv.html)
+
 ### Dependencies
 - [`pybullet`](https://github.com/bulletphysics/bullet3)([documentation](https://pybullet.org/wordpress/index.php/forum-2/))
 - [`blender`](https://www.blender.org/)
