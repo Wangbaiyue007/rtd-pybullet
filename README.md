@@ -18,8 +18,11 @@ Running RTD ([Autonomous Reachability-based Manipulator Trajectory Design](https
 - [`armour`](https://github.com/roahmlab/armtd-dev/tree/1719161629de9820625ad52bc8e42b7a01a6543d) (included as submodule)
 
 ### Install the Blender plugin on Ubuntu
-Make sure Blender is installed
+Make sure Blender is installed first. Then install the blender plugin:
+    
     sudo snap install blender --classic
+
+Look at the Blender documentation for installing plugins on Windows or MacOS.
 
 ### Install `rtd-pybullet`
     git clone https://github.com/roahmlab/rtd-pybullet
