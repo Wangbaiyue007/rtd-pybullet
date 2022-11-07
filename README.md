@@ -9,9 +9,20 @@ Running RTD ([Autonomous Reachability-based Manipulator Trajectory Design](https
 </table>
 
 
-## Installation and Dependencies
-- At the root folder, run `pip install -e .` to set up the package.
-- The physics engine of the smulation is [Bullet](https://github.com/bulletphysics/bullet3). For more information, check out their [documentation](https://pybullet.org/wordpress/index.php/forum-2/).
+## Installation
+### Dependencies
+Please visit the following links and be sure to install all of the dependencies:
+- [`pybullet`](https://github.com/bulletphysics/bullet3)([documentation](https://pybullet.org/wordpress/index.php/forum-2/))
+- [`zonopy`](https://github.com/roahmlab/zonopy)
+-[`pybullet-blender-recorder`](https://github.com/huy-ha/pybullet-blender-recorder)
+
+### Intall `rtd-pybullet`
+    git clone https://github.com/roahmlab/rtd-pybullet
+    cd rtd-pybullet
+    pip install -e .
+
+### Install `pybullet
+- The physics engine of the smulation is [Bullet](https://github.com/bulletphysics/bullet3). For more information, check out their .
 - The rendering part of this project is using [pybullet_blender_recorder](https://github.com/huy-ha/pybullet-blender-recorder). Please check out their instructions before doing rendering.
 - [Zonopy](https://github.com/kwonyos/zonopy) is a new python package to calculate rechable sets and render simulations. It is cloned as a submodule in this repo. This is where the Kinova obstacle avoidance task is generated from.
 
