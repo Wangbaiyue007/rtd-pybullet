@@ -1,5 +1,5 @@
-# rtd-pybullet
-Running ARMTD ([Autonomous Reachability-based Manipulator Trajectory Design](https://arxiv.org/abs/2002.01591)) in various platforms and simulate in pybullet, and create rendered animation.
+# RTD PyBullet
+Running RTD ([Autonomous Reachability-based Manipulator Trajectory Design](https://arxiv.org/abs/2002.01591)) in various platforms and simulate in pybullet, and create rendered animation.
 
 <table>
   <tr>
