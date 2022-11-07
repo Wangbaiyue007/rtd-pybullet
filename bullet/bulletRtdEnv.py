@@ -4,10 +4,11 @@ from typing import Tuple
 import pybullet as p
 import numpy as np
 import pybullet_data
-# zonopy
 import torch
-# from zonopy.environments.arm_3d import Arm_3D
-# from zonopy.optimize.armtd_3d import ARMTD_3D_planner
+from bullet.bulletPlanner import bulletPlanner
+from bullet.rrt import BuildRRT, Node
+import xml.etree.ElementTree as ET
+from typing import List
 
 clid = p.connect(p.SHARED_MEMORY)
 
@@ -15,7 +16,7 @@ class bulletRtdEnv:
 
     def __init__(
         self, 
-        urdf_path="../assets/fetch/fetch.urdf", 
+        urdf_path="../assets", 
         bulletGUI=True, 
         zonopyGUI=True,
         timestep=0.001, 
@@ -23,12 +24,12 @@ class bulletRtdEnv:
         useGravity=True, 
         useRobot=True, 
         useTorqueControl=True,
-        useZonopy=False,
+        planner=None,
+        record=False,
         q0 = [0]*7, 
         qgoal = [0]*7, 
         obs_pos = [[]],
-        obs_size = [],
-        debug=True
+        obs_size = []
         ):
 
         ############################## bullet #############################
@@ -49,22 +50,15 @@ class bulletRtdEnv:
         p.setAdditionalSearchPath(pybullet_data.getDataPath())
         # p.loadURDF('plane.urdf')
 
-        # set debug
-        self.debug = debug
-
         self.EnvId = []
         if useRobot:
-            self.robotId = p.loadURDF(urdf_path, [0, 0, 0], useFixedBase=True)
+            self.robotId = p.loadURDF(urdf_path+'/kinova_gen3_7dof/kinova_with_robotiq_85.urdf', [0, 0, 0], useFixedBase=True)
             self.EnvId = [self.robotId]
-        
-            # create offset so that the base position is the origin
-            # p.resetBasePositionAndOrientation(self.robotId, [0, 0, 0], [0, 0, 0, 1])
 
             # choose the end effector tool frame as end effector index
             self.actuation_index = []
             self.numJoints = p.getNumJoints(self.robotId)
             self.EndEffectorIndex = 8
-
 
             # set robot joint limits and rest positions
             self.ll, self.ul, self.jr, self.rp = self.get_joint_limits(self.robotId)
@@ -84,65 +78,87 @@ class bulletRtdEnv:
             self.Kp[i, i] = control_gain*(1-0.15*i)
             self.Kd[i, i] = 1.3*(self.Kp[i, i]/2)**0.5
 
-        self.path = [urdf_path]
+        self.path = [urdf_path+'/kinova_gen3_7dof/kinova_with_robotiq_85.urdf']
         self.scale = [[1, 1, 1]]
 
-        ############################## zonopy #############################
-        # initialize zonopy and its environment
-        self.zonopyGUI = zonopyGUI
+        # load obstacles
+        for i in range(len(obs_pos)):
+            self.load(urdf_path+"/objects/cube_small_zero.urdf", pos= obs_pos[i], scale=obs_size[i], urdf_index=i)
+
+        ############################## planner #############################
+        # initialize planner and its environment
         self.qgoal = qgoal
-        self.zonopy = None
+        self.planner_agent = None
         self.obs_pos = obs_pos
         self.obs_size = obs_size
         self.forwardkinematics(q0)
-        if useZonopy:
-            self.zonopy = self.Zonopy(q0=q0, qgoal=self.qgoal, obs_pos=obs_pos, obs_size=obs_size)
-            for i in range(len(obs_pos)):
-                self.load("../assets/objects/cube_small_zero.urdf", pos= obs_pos[i], scale=obs_size[0]*2)
+        self.qpos_sim = q0
+        self.qvel_sim = np.zeros(7)
+        self.qacc_sim = np.zeros(7)
+        self.record = record
+        self.qpos_record = np.array([q0])
+        self.qvel_record = np.array([np.zeros(7)])
+        self.qacc_record = np.array([np.zeros(7)])
+        self.qpos_des_record = np.array([q0])
+        self.qvel_des_record = np.array([np.zeros(7)])
+        self.qacc_des_record = np.array([np.zeros(7)])
+        self.planner_name = planner
 
-    def step(self, ka, qpos=[], qvel=[]):
+        if planner == 'zonopy':
+            self.planner_agentGUI = zonopyGUI
+            self.planner_agent = bulletPlanner.Zonopy(q0=q0, qgoal=self.qgoal, obs_pos=obs_pos, obs_size=obs_size)
+        elif planner == 'armour':
+            self.zonopy = bulletPlanner.Zonopy(q0=q0, qgoal=self.qgoal, obs_pos=obs_pos, obs_size=obs_size)
+            self.initialize_armour()
+
+
+    def initialize_armour(self):
+        self.planner_agent = bulletPlanner.ARMOUR(obs_pos=self.obs_pos, obs_size=self.obs_size)
+
+    def initialize_zonopy(self, qpos, qgoal, obs_pos, obs_size):
+        self.planner_agent = self.planner_agent(q0=qpos, qgoal=qgoal, obs_pos=obs_pos, obs_size=obs_size)
+
+    def step(self, ka: np.ndarray, qpos=[], qvel=[]):
         """
         Step for 1 planning iteration (0.5 s) in pybullet
         """
-        ka = ka.numpy()
         steps = int(0.5/self.timestep)
 
         if len(qpos) == 0 and len(qvel) == 0:
             qpos, qvel = self.get_joint_states()
+            qacc = (qvel - self.qvel_sim) / self.timestep
+            self.qacc_sim = qacc
 
         for i in range(steps):
-            # calculate desired trajectory
-            qpos, qvel = self.get_joint_traj(qpos, qvel, ka)
-            # inverse dynamics controller
-            torque = self.inversedynamics(qpos, qvel, ka)
+            if self.planner_name == 'zonopy':
+                # calculate desired trajectory: linear function
+                qpos, qvel = self.get_joint_traj(qpos, qvel, ka)
+                torque = self.inversedynamics(qpos, qvel, ka)
+            elif self.planner_name == 'armour':
+                # calculate desired trajectory: Bezier curve
+                t = self.timestep * i
+                qdes = self.planner_agent.get_des_traj(q0=qpos, qd0=qvel, qdd0=qacc, k=ka, t=t)
+                torque = self.inversedynamics(qdes[:,0], qdes[:,1], qdes[:,2])
             self.torque_control(torque)
             p.stepSimulation()
             # time.sleep(self.timestep)
-    
-    def step_hardware(self, ka, ka_pre, qpos_d=[], qvel_d=[]):
-        """
-        Step for 1 planning iteration (0.5 s) in pybullet
-        """
-        ka = ka.numpy()
-        steps = int(0.5/self.timestep)
+            # update states
+            qpos_sim, qvel_sim = self.get_joint_states()
+            self.qacc_sim = (qvel_sim - self.qvel_sim) / self.timestep
+            self.qpos_sim = qpos_sim
+            self.qvel_sim = qvel_sim
+            if self.record:
+                self.qpos_des_record = np.append(self.qpos_des_record, np.array([qdes[:,0]]), axis=0)
+                self.qvel_des_record = np.append(self.qvel_des_record, np.array([qdes[:,1]]), axis=0)
+                self.qacc_des_record = np.append(self.qacc_des_record, np.array([qdes[:,2]]), axis=0)
+                self.qpos_record = np.append(self.qpos_record, np.array([qpos_sim]), axis=0)
+                self.qvel_record = np.append(self.qvel_record, np.array([qvel_sim]), axis=0)
+                self.qacc_record = np.append(self.qacc_record, np.array([self.qacc_sim]), axis=0)
 
-        if len(qpos_d) == 0 and len(qvel_d) == 0:
-            qpos_d, qvel_d = self.get_joint_states()
-
-        for i in range(steps):
-            # calculate desired trajectory
-            qpos_d, qvel_d = self.get_joint_traj(qpos_d, qvel_d, ka)
-            # inverse dynamics controller
-            torque = self.inversedynamics(qpos_d, qvel_d, ka)
-            self.torque_control(torque)
-            p.stepSimulation()
-            # time.sleep(self.timestep)
-
-    def rrt(self, goal_pos=[]):
+    def rrt(self, goal_pos=[]) -> Tuple[List[Node], bool]:
         """
-        RRT algorithm that builds waypoints.
+        RRT algorithm that builds waypoints
         """
-        from bullet.rrt import BuildRRT
         start_pos, _ = self.get_joint_states()
         self.goal_pos = np.array(goal_pos)
 
@@ -155,57 +171,68 @@ class bulletRtdEnv:
             rrt_builder.backtrace()
             rrt_builder.shortcut_smoothing()
             waypoints = rrt_builder.solution
+            waypoints = waypoints[0::4]
+            self.plot_waypoints(waypoints)
             return waypoints, success
         else:
             return 0, False
 
-    def _armtd_track(self, waypoints):
+    def plot_waypoints(self, waypoints: List[Node]):
+        """
+        Plot waypoints in the environment
+        """
+        for node in waypoints:
+            joint_node = node.pos
+            euclidean_node = self.forwardkinematics(joint_node)
+            p.addUserDebugPoints(pointPositions=[euclidean_node[0:3].tolist()], pointColorsRGB=[[0.2, 0.2, 1.0]], pointSize=10)  
+
+        # return to the start position
+        self.forwardkinematics(self.qpos_sim)
+
+    def armtd_plan(self, goal: np.ndarray):
+        """
+        Plan for 1 planning iteration of ARMTD
+        """
+        if self.planner_name == 'zonopy':
+            self.planner_agent.arm3d.qgoal = torch.tensor(goal, dtype=self.planner_agent.arm3d.dtype, device=self.planner_agent.arm3d.device)
+            k, done = self.planner_agent.step()
+            self.planner_agent.arm3d.render()
+        elif self.planner_name == 'armour':
+            k = self.planner_agent.plan(q0=self.qpos_sim, qd0=self.qvel_sim, qdd0=self.qacc_sim, goal=goal)
+            # TODO: done
+            done = False
+
+        return k, done
+
+    def _armtd_track(self, waypoints: List[Node]):
         """
         Tracking waypoints using armtd
         """
         for point in range(len(waypoints)):
             print("point: ", point)
             waypoint = waypoints[point]
-            self.zonopy.arm3d.qgoal = torch.tensor(waypoint.pos, dtype=self.zonopy.arm3d.dtype, device=self.zonopy.arm3d.device)
-            qacc, done = self.zonopy.step()
-            self.zonopy.arm3d.render()
-            self.step(qacc)
-            # minimize goal position error
-            '''
-            if point == len(waypoints) -1:
-                print("\nApproaching goal...\n")
-                index = 0
-                self.qpos_e = np.zeros(7)
-                while True:
-                    info = self.local_attractor(self.goal_pos, index)
-                    index += 1
-                    collision = info['collision']
-                    qpos, qvel = self._get_state()
-                    if precise_goal and (self.goal_distance(qpos, self.goal_pos) < 0.02 and np.linalg.norm(qvel) < 0.005): 
-                        success = True
-                        break
-                    if (not precise_goal) and (self.goal_distance(qpos, self.goal_pos) < 0.1 and np.linalg.norm(qvel) < 0.1):
-                        success = True
-                        break
-            '''
+            for _ in range(2):
+                k, done = self.armtd_plan(waypoint.pos)
+                self.step(k)
+            # TODO: minimize goal position error
                 
         return done
 
-    def armtd_track_hardware(self, waypoint):
+    def armtd_track_hardware(self, waypoint: Node):
         """
         Tracking a waypoint using armtd
         """
 
         # modify goal position as next waypoint
-        self.zonopy.arm3d.qgoal = torch.tensor(waypoint.pos, dtype=self.zonopy.arm3d.dtype, device=self.zonopy.arm3d.device)
+        self.planner_agent.arm3d.qgoal = torch.tensor(waypoint.pos, dtype=self.planner_agent.arm3d.dtype, device=self.planner_agent.arm3d.device)
         # modify robot state using hardware data;
         # plan and step zonopy environment
-        qacc, done = self.zonopy.step_hardware(self.qpos_hardware, self.qvel_hardware)
-        if self.zonopyGUI[0]:
-            self.zonopy.arm3d.render()
+        qacc, done = self.planner_agent.step_hardware(self.qpos_hardware, self.qvel_hardware)
+        if self.planner_agentGUI[0]:
+            self.planner_agent.arm3d.render()
         # step pybullet environment using the previous plan
         if self.bulletGUI[0]:
-            self.step(ka=self.zonopy.ka_pre, qpos=self.qpos_hardware, qvel=self.qvel_hardware)
+            self.step(ka=self.planner_agent.ka_pre, qpos=self.qpos_hardware, qvel=self.qvel_hardware)
         
         # return new plan
         return done, qacc
@@ -214,9 +241,10 @@ class bulletRtdEnv:
         """
         Simulate process of rrt + armtd
         """
-        waypoints, success = self.rrt(goal_pos=goal_pos)
+        self.waypoints, success = self.rrt(goal_pos=goal_pos)
+        del self.zonopy
         if success:
-            self._armtd_track(waypoints)
+            self._armtd_track(self.waypoints)
         else:
             sys.exit("RRT failed to build tree.")
 
@@ -260,8 +288,8 @@ class bulletRtdEnv:
         return np.array(Qpos), np.array(Qvel)
 
     def set_joint_states_hardware(self, qpos, qvel):
-        self.qpos_hardware = torch.tensor(qpos, dtype=self.zonopy.arm3d.dtype)
-        self.qvel_hardware = torch.tensor(qvel, dtype=self.zonopy.arm3d.dtype)
+        self.qpos_hardware = torch.tensor(qpos, dtype=self.planner_agent.arm3d.dtype)
+        self.qvel_hardware = torch.tensor(qvel, dtype=self.planner_agent.arm3d.dtype)
 
     def get_joint_traj(self, qpos_pre: np.array, qvel_pre: np.array, qacc_d: np.array) -> Tuple[np.array, np.array]:
         """
@@ -285,7 +313,7 @@ class bulletRtdEnv:
             jointPoses = p.calculateInverseKinematics(self.robotId, self.EndEffectorIndex, pos, self.ll, self.ul, self.jr, self.rp)
         return jointPoses
 
-    def forwardkinematics(self, qpos: np.array) -> np.array:
+    def forwardkinematics(self, qpos: np.ndarray) -> np.ndarray:
         """
         Force set the joint positions of actuated joints. \n
         return: position and orientation of the end effector.
@@ -304,9 +332,6 @@ class bulletRtdEnv:
         ori = np.array(p.getEulerFromQuaternion(ls[1]))
 
         return np.append(pos, ori)
-
-    def initialize_zonopy(self, qpos, qgoal, obs_pos, obs_size):
-        self.zonopy = self.Zonopy(q0=qpos, qgoal=qgoal, obs_pos=obs_pos, obs_size=obs_size)
     
     def inversedynamics(self, qpos_des, qvel_des, qacc_des: np.array) -> np.array:
         """
@@ -334,12 +359,17 @@ class bulletRtdEnv:
         quat = p.getQuaternionFromEuler(euler)
         return quat
 
-    def load(self, filename: str, pos: list=[0, 0, 0], ori: list=[0, 0, 0], scale: float=1, saveid: bool=True) -> Tuple[int, str]:
+    def load(self, filename: str, pos: list=[0, 0, 0], ori: list=[0, 0, 0], scale: list=[1.0], urdf_index: int=0, saveid: bool=True) -> Tuple[int, str]:
         """
         Loading an object from URDF. \n
         return: object id.
         """
-        objId = p.loadURDF(filename, globalScaling=scale)
+        if len(scale) == 1:
+            objId = p.loadURDF(filename, globalScaling=scale)
+        else:
+            filename_new = self.scale_urdf(filename, scale, urdf_index)
+            objId = p.loadURDF(filename_new)
+        
         if saveid:
             self.EnvId.append(objId)
             self.path.append(filename)
@@ -348,6 +378,24 @@ class bulletRtdEnv:
         ori = self.Euler2Quat(ori)
         p.resetBasePositionAndOrientation(objId, pos, ori)
         return objId, filename
+    
+    def scale_urdf(self, filename, scale, index) -> str:
+        """
+        Scale the urdf file by direct access. This will modify the file permanently.
+        """
+
+        assert len(scale) == 3, "Input scale should have length 3."
+        scale_str = ' '.join(str(e) for e in scale)
+        tree = ET.parse(filename)
+        root = tree.getroot()
+
+        root[0].find('visual').find('geometry')[0].set('scale', scale_str)
+        root[0].find('collision').find('geometry')[0].set('size', scale_str)
+
+        filename_new = filename+str(index)+'temp.urdf'
+        tree.write(filename_new)
+
+        return filename_new
 
     def set_obj_config(self, objId: int, objPos: np.array, objOri: np.array):
         """
@@ -405,79 +453,3 @@ class bulletRtdEnv:
 
     def Disconnect(self):
         p.disconnect()
-
-    class Zonopy:
-
-        def __init__(self, q0 = [0]*7, qgoal = [0]*7, obs_pos = [[]], obs_size = [], dtype = torch.float, device = 'cuda:0'):
-            obs_size_max = obs_size*3
-            obs_size_min = obs_size*3
-            self.arm3d = Arm_3D(robot="Kinova3", n_obs=len(obs_pos), \
-                 obs_size_max=obs_size_max, obs_size_min=obs_size_min, FO_render_freq=25, goal_threshold=0.1)
-            q = torch.tensor(q0, dtype=dtype, device=device)
-            qd = torch.zeros(self.arm3d.n_links, dtype=dtype, device=device)
-            qgoal = torch.tensor(qgoal, dtype=dtype, device=device)
-            obs_pos = torch.tensor(obs_pos, dtype=dtype, device=device)
-            obs_size = [torch.tensor(obs_size_max,dtype=dtype,device=device) for _ in range(len(obs_pos))]
-            self.arm3d.set_initial(q, qd, qgoal, obs_pos, obs_size)
-            self.planner = ARMTD_3D_planner(self.arm3d, dtype=dtype, device=device)
-            self.ka_0 = torch.zeros(self.arm3d.dof)
-            self.ka = torch.zeros(self.arm3d.dof)
-
-        def step(self):
-            
-            if self.debug:
-                print(f"Iteration {iter}")
-            ka, flag = self.planner.plan(self.arm3d, self.ka_0)
-            ka_break = (-self.arm3d.qvel) / 0.5
-
-            if self.debug:
-                print(f"qvel_prestep: {self.arm3d.qvel}")
-            observations, reward, done, info = self.arm3d.step(ka.cpu(), flag)
-            if self.debug:
-                print(f"qvel_poststep: {self.arm3d.qvel}")
-
-            safe = self.arm3d.safe
-            if safe:
-                if self.debug:
-                    print("--safe move--")
-                qacc = ka.cpu()
-            else:
-                if self.debug:
-                    print("--safe break--")
-                qacc = ka_break.cpu()
-            if self.debug:
-                print(f"qacc: {qacc}")
-
-            return qacc, done
-
-        def step_hardware(self, qpos_hardware, qvel_hardware):
-            # correct env state using hardware data
-            self.arm3d.qpos = qpos_hardware
-            self.arm3d.qvel = qvel_hardware
-
-            # plan for the future 0.5 sec, which should be used for the next step
-            ka, flag = self.planner.plan_hardware(self.arm3d, self.ka_0, self.ka)
-            print(ka)
-            ka_break = (-self.arm3d.qvel) / 0.5
-
-            # step the previous plan in the zonopy environment
-            observations, reward, done, info = self.arm3d.step(self.ka.cpu(), flag)
-
-            # fail save manuvoir
-            safe = self.arm3d.safe
-            if safe:
-                print("--safe move--")
-                qacc = ka.cpu()
-            else:
-                print("--safe break--")
-                qacc = ka_break.cpu()
-            # print(f"qacc: {qacc}")
-
-            # Update the plan
-            self.ka_pre = self.ka
-            self.ka = qacc
-
-            return qacc, done
-
-        def saturation(self, ka):
-            return 

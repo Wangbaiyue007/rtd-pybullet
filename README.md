@@ -1,7 +1,47 @@
-# rtd-pybullet
-Running ARMTD ([Autonomous Reachability-based Manipulator Trajectory Design](https://arxiv.org/abs/2002.01591)) in various platforms and simulate in pybullet, and create rendered animation.
+# RTD PyBullet
+Running RTD ([Autonomous Reachability-based Manipulator Trajectory Design](https://arxiv.org/abs/2002.01591)) in various platforms and simulate in pybullet, and create rendered animation.
 
-## Examples
+<table>
+  <tr>
+    <td><img src="data/gif/kinova_obstacle_avoidance.gif?raw=true" width="400"></td>
+    <td><img src="data/gif/fetch_force_closure.gif?raw=true" width="400"></td>
+  </tr>
+</table>
+
+## Installation
+It would be a good idea to install the python code in a virtual environment using using either [`conda`](https://docs.conda.io/en/latest/) or [`venv`](https://docs.python.org/3/library/venv.html).
+
+### Dependencies
+- [`pybullet`](https://github.com/bulletphysics/bullet3)([documentation](https://pybullet.org/wordpress/index.php/forum-2/))
+- [`blender`](https://www.blender.org/)
+- [`pybullet-blender-recorder`](https://github.com/huy-ha/pybullet-blender-recorder)
+- [`pytorch`](https://github.com/pytorch/pytorch)
+- [`zonopy`](https://github.com/roahmlab/zonopy) (included as submodule)
+- [`armour`](https://github.com/roahmlab/armtd-dev/tree/1719161629de9820625ad52bc8e42b7a01a6543d) (included as submodule)
+
+### Install the Blender plugin on Ubuntu
+Make sure Blender is installed first. Then install the blender plugin:
+    
+    sudo snap install blender --classic
+
+Look at the Blender documentation for installing plugins on Windows or MacOS.
+
+### Install `rtd-pybullet`
+    git clone https://github.com/roahmlab/rtd-pybullet
+    cd rtd-pybullet
+    git submodule update --init --recursive
+    pip install -e .
+
+### Install `zonopy`
+    cd rtd-pybullet/zonopy
+    pip install -e .
+
+<!-- ### Install `pybullet -->
+<!-- - The physics engine of the smulation is [Bullet](https://github.com/bulletphysics/bullet3). For more information, check out their . -->
+<!-- - The rendering part of this project is using [pybullet_blender_recorder](https://github.com/huy-ha/pybullet-blender-recorder). Please check out their instructions before doing rendering. -->
+<!-- - [Zonopy](https://github.com/kwonyos/zonopy) is a new python package to calculate rechable sets and render simulations. It is cloned as a submodule in this repo. This is where the Kinova obstacle avoidance task is generated from. -->
+
+<!-- ## Examples
 ### Kinova obstacle avoidance using ARMTD
 <p align="center">
     <img src="data/gif/kinova_obstacle_avoidance.gif">
@@ -10,18 +50,12 @@ Running ARMTD ([Autonomous Reachability-based Manipulator Trajectory Design](htt
 ### Fetch carrying objects using ARMTD with force closure
 <p align="center">
     <img src="data/gif/fetch_force_closure.gif">
-<p/>
+<p/> -->
 
-## Runnint zonopy + pybullet
-Go to `scripts/` and run `test_bullet_zonopy.py` to see what happens.
+## Examples
+Go to `scripts/` and run `test_bullet_planner.py` to see what happens.
 
 ## Rendering trajectory and zonotopes
-### 0. Notes
-- At the root folder, run `pip install -e .` to set up the package.
-- The physics engine of the smulation is [Bullet](https://github.com/bulletphysics/bullet3). For more information, check out their [documentation](https://pybullet.org/wordpress/index.php/forum-2/).
-- The rendering part of this project is using [pybullet_blender_recorder](https://github.com/huy-ha/pybullet-blender-recorder). Please check out their instructions before doing rendering.
-- [Zonopy](https://github.com/kwonyos/zonopy) is a new python package to calculate rechable sets and render simulations. It is cloned as a submodule in this repo. This is where the Kinova obstacle avoidance task is generated from.
-
 ### I. Running zonopy simulation and record data
 Zonopy environment will generate an obstacle avoidance task, where a Kinova arm starts from a random position moves towards a random goal positions, with random obstacles around. Run `scripts/test_zonopy.py` to see what happens.
 
