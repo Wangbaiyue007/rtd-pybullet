@@ -36,26 +36,21 @@ Look at the Blender documentation for installing plugins on Windows or MacOS.
     cd rtd-pybullet/zonopy
     pip install -e .
 
-<!-- ### Install `pybullet -->
-<!-- - The physics engine of the smulation is [Bullet](https://github.com/bulletphysics/bullet3). For more information, check out their . -->
-<!-- - The rendering part of this project is using [pybullet_blender_recorder](https://github.com/huy-ha/pybullet-blender-recorder). Please check out their instructions before doing rendering. -->
-<!-- - [Zonopy](https://github.com/kwonyos/zonopy) is a new python package to calculate rechable sets and render simulations. It is cloned as a submodule in this repo. This is where the Kinova obstacle avoidance task is generated from. -->
+### Build `ARMOUR`
+    cd armtd-dev/cuda-dev/PZsparse-Bernstein/build
+    cmake ..
+    make
+We need to add the path to `PYTHONPATH` so that python can find the pybind module created by CMake.
 
-<!-- ## Examples
-### Kinova obstacle avoidance using ARMTD
-<p align="center">
-    <img src="data/gif/kinova_obstacle_avoidance.gif">
-<p/>
-
-### Fetch carrying objects using ARMTD with force closure
-<p align="center">
-    <img src="data/gif/fetch_force_closure.gif">
-<p/> -->
+    export PYTHONPATH=$PYTHONPATH:$PWD
 
 ## Examples
+### ARMOUR examples
 Go to `scripts/` and run `test_bullet_planner.py` to see what happens.
+### Zonopy examples
+Go to `scripts/` and run `test_zonopy.py` to see what happens.
 
-## Rendering trajectory and zonotopes
+## Rendering trajectory and zonotopes (this needs update)
 ### I. Running zonopy simulation and record data
 Zonopy environment will generate an obstacle avoidance task, where a Kinova arm starts from a random position moves towards a random goal positions, with random obstacles around. Run `scripts/test_zonopy.py` to see what happens.
 
