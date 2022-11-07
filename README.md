@@ -1,13 +1,21 @@
 # rtd-pybullet
 Running ARMTD ([Autonomous Reachability-based Manipulator Trajectory Design](https://arxiv.org/abs/2002.01591)) in various platforms and simulate in pybullet, and create rendered animation.
 
+<table>
+  <tr>
+    <td><img src="data/gif/kinova_obstacle_avoidance.gif?raw=true" width="200"></td>
+    <td><img src="data/gif/fetch_force_closure.gif?raw=true" width="200"></td>
+  </tr>
+</table>
+
+
 ## Installation and Dependencies
 - At the root folder, run `pip install -e .` to set up the package.
 - The physics engine of the smulation is [Bullet](https://github.com/bulletphysics/bullet3). For more information, check out their [documentation](https://pybullet.org/wordpress/index.php/forum-2/).
 - The rendering part of this project is using [pybullet_blender_recorder](https://github.com/huy-ha/pybullet-blender-recorder). Please check out their instructions before doing rendering.
 - [Zonopy](https://github.com/kwonyos/zonopy) is a new python package to calculate rechable sets and render simulations. It is cloned as a submodule in this repo. This is where the Kinova obstacle avoidance task is generated from.
 
-## Examples
+<!-- ## Examples
 ### Kinova obstacle avoidance using ARMTD
 <p align="center">
     <img src="data/gif/kinova_obstacle_avoidance.gif">
@@ -16,7 +24,7 @@ Running ARMTD ([Autonomous Reachability-based Manipulator Trajectory Design](htt
 ### Fetch carrying objects using ARMTD with force closure
 <p align="center">
     <img src="data/gif/fetch_force_closure.gif">
-<p/>
+<p/> -->
 
 ## Runnint zonopy + pybullet
 Go to `scripts/` and run `test_bullet_zonopy.py` to see what happens.
