@@ -41,7 +41,7 @@ Please visit the following links and be sure to install all of the dependencies:
     <img src="data/gif/fetch_force_closure.gif">
 <p/> -->
 
-## Running zonopy + pybullet
+## Examples
 Go to `scripts/` and run `test_bullet_zonopy.py` to see what happens.
 
 ## Rendering trajectory and zonotopes
