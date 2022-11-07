@@ -32,6 +32,10 @@ Look at the Blender documentation for installing plugins on Windows or MacOS.
     git submodule update --init --recursive
     pip install -e .
 
+### Install `zonopy`
+    cd rtd-pybullet/zonopy
+    pip install -e .
+
 <!-- ### Install `pybullet -->
 <!-- - The physics engine of the smulation is [Bullet](https://github.com/bulletphysics/bullet3). For more information, check out their . -->
 <!-- - The rendering part of this project is using [pybullet_blender_recorder](https://github.com/huy-ha/pybullet-blender-recorder). Please check out their instructions before doing rendering. -->
