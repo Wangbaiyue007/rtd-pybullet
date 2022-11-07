@@ -21,10 +21,10 @@ Please visit the following links and be sure to install all of the dependencies:
     cd rtd-pybullet
     pip install -e .
 
-### Install `pybullet
-- The physics engine of the smulation is [Bullet](https://github.com/bulletphysics/bullet3). For more information, check out their .
-- The rendering part of this project is using [pybullet_blender_recorder](https://github.com/huy-ha/pybullet-blender-recorder). Please check out their instructions before doing rendering.
-- [Zonopy](https://github.com/kwonyos/zonopy) is a new python package to calculate rechable sets and render simulations. It is cloned as a submodule in this repo. This is where the Kinova obstacle avoidance task is generated from.
+<!-- ### Install `pybullet -->
+<!-- - The physics engine of the smulation is [Bullet](https://github.com/bulletphysics/bullet3). For more information, check out their . -->
+<!-- - The rendering part of this project is using [pybullet_blender_recorder](https://github.com/huy-ha/pybullet-blender-recorder). Please check out their instructions before doing rendering. -->
+<!-- - [Zonopy](https://github.com/kwonyos/zonopy) is a new python package to calculate rechable sets and render simulations. It is cloned as a submodule in this repo. This is where the Kinova obstacle avoidance task is generated from. -->
 
 <!-- ## Examples
 ### Kinova obstacle avoidance using ARMTD
@@ -37,7 +37,7 @@ Please visit the following links and be sure to install all of the dependencies:
     <img src="data/gif/fetch_force_closure.gif">
 <p/> -->
 
-## Runnint zonopy + pybullet
+## Running zonopy + pybullet
 Go to `scripts/` and run `test_bullet_zonopy.py` to see what happens.
 
 ## Rendering trajectory and zonotopes
