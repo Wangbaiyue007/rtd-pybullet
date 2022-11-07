@@ -20,7 +20,7 @@ Please visit the following links and be sure to install all of the dependencies:
 - [`armour`](https://github.com/roahmlab/armtd-dev/tree/1719161629de9820625ad52bc8e42b7a01a6543d)
 
 
-### Intall `rtd-pybullet`
+### Install `rtd-pybullet`
     git clone https://github.com/roahmlab/rtd-pybullet
     cd rtd-pybullet
     pip install -e .
