@@ -20,7 +20,6 @@ It would be a good idea to install the python code in a virtual environment usin
 ### Included as submodules
 - [`zonopy`](https://github.com/roahmlab/zonopy)
 - [`armour`](https://github.com/roahmlab/armtd-dev/tree/1719161629de9820625ad52bc8e42b7a01a6543d)
-There's no need to install these.
 
 ### Install the Blender plugin on Ubuntu
 Make sure Blender is installed first. Then install the blender plugin:
