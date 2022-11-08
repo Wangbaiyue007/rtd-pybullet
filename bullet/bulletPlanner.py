@@ -23,7 +23,7 @@ class bulletPlanner:
             obs_stack = stack_obstacles(obs_pos=obs_pos, obs_size=obs_size)
             self.planner = armtd_main_pybind.pzsparse(obs_stack)
         
-        def plan(self, q0: np.ndarray, qd0: np.ndarray, qdd0: np.ndarray, goal: np.ndarray):
+        def plan(self, q0: np.ndarray, qd0: np.ndarray, qdd0: np.ndarray, goal: np.ndarray) -> np.ndarray:
             """
             Return Berenstein coefficients
             """
