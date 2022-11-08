@@ -6,7 +6,7 @@ def stack_obstacles(obs_pos, obs_size):
     Stacking obstacles information to be armour input
     """
     obs_pos_np = np.array(obs_pos)
-    obs_size_np = np.array(obs_size)
+    obs_size_np = np.array(obs_size / 2)
     obs_size_stack = np.empty([1,9])
     for size in obs_size_np:
         obs_size_stack = np.concatenate([obs_size_stack, (size*np.eye(3)).reshape(1,9)], axis=0)
