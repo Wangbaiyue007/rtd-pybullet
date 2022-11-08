@@ -11,13 +11,16 @@ Running RTD ([Autonomous Reachability-based Manipulator Trajectory Design](https
 ## Installation
 It would be a good idea to install the python code in a virtual environment using using either [`conda`](https://docs.conda.io/en/latest/) or [`venv`](https://docs.python.org/3/library/venv.html).
 
-### Dependencies
+### External Dependencies
 - [`pybullet`](https://github.com/bulletphysics/bullet3)([documentation](https://pybullet.org/wordpress/index.php/forum-2/))
 - [`blender`](https://www.blender.org/)
 - [`pybullet-blender-recorder`](https://github.com/huy-ha/pybullet-blender-recorder)
 - [`pytorch`](https://github.com/pytorch/pytorch)
-- [`zonopy`](https://github.com/roahmlab/zonopy) (included as submodule)
-- [`armour`](https://github.com/roahmlab/armtd-dev/tree/1719161629de9820625ad52bc8e42b7a01a6543d) (included as submodule)
+
+### Included as submodules
+- [`zonopy`](https://github.com/roahmlab/zonopy)
+- [`armour`](https://github.com/roahmlab/armtd-dev/tree/1719161629de9820625ad52bc8e42b7a01a6543d)
+There's no need to install these.
 
 ### Install the Blender plugin on Ubuntu
 Make sure Blender is installed first. Then install the blender plugin:
