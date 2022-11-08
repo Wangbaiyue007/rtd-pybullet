@@ -6,7 +6,7 @@ def plotTraj(btEnv: bulletRtdEnv):
     assert btEnv.record == True, f"The environment recorder is not turned on."
 
     t = np.arange(np.size(btEnv.qpos_record, axis=0), dtype=float) * btEnv.timestep
-    waypoints = np.array([np.array(btEnv.q0)])
+    waypoints = np.array([btEnv.qpos_record[0]])
     for waypoint in btEnv.waypoints: 
         waypoints = np.append(waypoints, [waypoint.pos], axis=0)
     index = np.arange(np.size(waypoints, axis=0), dtype=float) * 1
