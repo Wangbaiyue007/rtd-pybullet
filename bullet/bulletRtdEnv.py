@@ -7,6 +7,7 @@ import pybullet_data
 import torch
 from bullet.bulletPlanner import bulletPlanner
 from bullet.rrt import BuildRRT, Node
+from recorder.pyBulletSimRecorder import PyBulletRecorder
 import xml.etree.ElementTree as ET
 from typing import List
 
@@ -26,6 +27,7 @@ class bulletRtdEnv:
         useTorqueControl=True,
         planner=None,
         record=False,
+        blender_record=False,
         q0 = [0]*7, 
         qgoal = [0]*7, 
         obs_pos = [[]],
@@ -54,19 +56,16 @@ class bulletRtdEnv:
         if useRobot:
             self.robotId = p.loadURDF(urdf_path+'/kinova_gen3_7dof/kinova_with_robotiq_85.urdf', [0, 0, 0], useFixedBase=True)
             self.EnvId = [self.robotId]
-
             # choose the end effector tool frame as end effector index
             self.actuation_index = []
             self.numJoints = p.getNumJoints(self.robotId)
             self.EndEffectorIndex = 8
-
             # set robot joint limits and rest positions
             self.ll, self.ul, self.jr, self.rp = self.get_joint_limits(self.robotId)
 
         if useTorqueControl and useRobot:
             # Disable the motors for torque control
             p.setJointMotorControlArray(self.robotId, self.actuation_index, p.VELOCITY_CONTROL, forces=np.zeros(len(self.actuation_index))) 
-
             # Disable link damping
             for i in range(self.numJoints):
                 p.changeDynamics(self.robotId, i-1, linearDamping=0, angularDamping=0)
@@ -77,7 +76,6 @@ class bulletRtdEnv:
         for i in range(7):
             self.Kp[i, i] = control_gain*(1-0.15*i)
             self.Kd[i, i] = 1.3*(self.Kp[i, i]/2)**0.5
-
         self.path = [urdf_path+'/kinova_gen3_7dof/kinova_with_robotiq_85.urdf']
         self.scale = [[1, 1, 1]]
 
@@ -114,6 +112,15 @@ class bulletRtdEnv:
         elif planner == 'armour':
             self.zonopy = bulletPlanner.Zonopy(q0=q0, qgoal=self.qgoal, obs_pos=obs_pos, obs_size=obs_size)
             self.initialize_armour()
+
+        ############################## blender #############################
+        self.blender_record = blender_record
+        self.blender = PyBulletRecorder()
+        # register robot
+        self.blender.register_object(self.EnvId[0], self.path[0])
+        # register obstacles with correct scale
+        for i in range(1, len(self.EnvId)):
+            self.blender.register_object(self.EnvId[i], self.path[i], obs_size[i-1])
 
 
     def initialize_armour(self):
@@ -158,6 +165,8 @@ class bulletRtdEnv:
                 self.qpos_record = np.append(self.qpos_record, np.array([qpos_sim]), axis=0)
                 self.qvel_record = np.append(self.qvel_record, np.array([qvel_sim]), axis=0)
                 self.qacc_record = np.append(self.qacc_record, np.array([self.qacc_sim]), axis=0)
+            if self.blender_record and i % 20 == 0:
+                self.blender.add_keyframe()
 
     def rrt(self, goal_pos=[]) -> Tuple[List[Node], bool]:
         """
@@ -458,6 +467,9 @@ class bulletRtdEnv:
         self.EnvId.append(Id)
         self.path.append(filename)
         return Id
+
+    def dump_video(self, filename):
+        self.blender.save(filename)
     
     def remove_body(self, bodyId):
         p.removeBody(bodyId)
