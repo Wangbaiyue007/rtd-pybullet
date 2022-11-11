@@ -9,15 +9,15 @@ def plotTraj(btEnv: bulletRtdEnv):
     waypoints = np.array([btEnv.qpos_record[0]])
     for waypoint in btEnv.waypoints: 
         waypoints = np.append(waypoints, [waypoint.pos], axis=0)
-    index = np.arange(np.size(waypoints, axis=0), dtype=float) * 1
+    index = np.arange(np.size(waypoints, axis=0), dtype=float) * 0.5
     
     fig, axs = plt.subplots(nrows=7, ncols=3, constrained_layout=True)
     for i, ax in enumerate(axs.flat):
         joint = int(i/3)
         if i % 3 == 0:
+            line3, = ax.plot(index, waypoints[:,joint], 'bs', label='waypoints', linewidth=1.5)
             line2, = ax.plot(t, btEnv.qpos_record[:,joint], 'g-', label='sim', linewidth=3.0)
             line1, = ax.plot(t, btEnv.qpos_des_record[:,joint], 'r--', label='desired', linewidth=1.5)
-            line3, = ax.plot(index, waypoints[:,joint], 'bs', label='waypoints', linewidth=1.5)
             ax.set_title('$q$'+str(joint+1))
             ax.grid(True)
         if i % 3 == 1:

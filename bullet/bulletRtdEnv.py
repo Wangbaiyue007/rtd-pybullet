@@ -184,7 +184,7 @@ class bulletRtdEnv:
             rrt_builder.backtrace()
             rrt_builder.shortcut_smoothing()
             waypoints = rrt_builder.solution
-            waypoints = waypoints[0::4]
+            # waypoints = waypoints[0::2]
             self.plot_waypoints(waypoints)
             return waypoints, success
         else:
@@ -228,7 +228,7 @@ class bulletRtdEnv:
         for point in range(len(waypoints)):
             print("point: ", point)
             waypoint = waypoints[point]
-            for _ in range(2):
+            for _ in range(1):
                 k, done = self.armtd_plan(waypoint.pos)
                 self.step(k)
             # TODO: minimize goal position error

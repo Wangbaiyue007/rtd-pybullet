@@ -1,9 +1,9 @@
 import numpy as np
 from bullet.bulletRtdEnv import bulletRtdEnv
 
-data = np.load("../data/trajectories/force_closure_success.npz")
-k = data['k'] * np.array([np.pi / 72, np.pi / 72, np.pi / 72, np.pi / 72, np.pi / 72, np.pi / 72, np.pi / 72])
-q0 = data['q0'] + np.array([np.pi, 0, 0, 0, 0, 0, 0])
+data = np.load("../data/trajectories/traj1.npz")
+k = data['k'] #* np.array([np.pi / 72, np.pi / 72, np.pi / 72, np.pi / 72, np.pi / 72, np.pi / 72, np.pi / 72])
+q0 = data['q0'] #+ np.array([np.pi, 0, 0, 0, 0, 0, 0])
 qd0 = data['qd0']
 qdd0 = data['qdd0']
 # waypoints = data['waypoints']
@@ -30,5 +30,5 @@ btEnv = bulletRtdEnv(urdf_path=urdf_path, zonopyGUI=useGUI, useGravity=useGravit
 for i in range(np.size(k, axis=0)):
     btEnv.step(k[i])
 
-btEnv.dump_video('../data/trajectories/traj3.pkl')
+btEnv.dump_video('../data/trajectories/traj1.pkl')
 breakpoint()
