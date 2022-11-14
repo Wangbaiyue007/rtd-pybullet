@@ -13,6 +13,10 @@ from typing import List
 
 clid = p.connect(p.SHARED_MEMORY)
 
+def wrap_to_pi(q: np.ndarray):
+    q_wrapped = (q + np.pi) % (2 * np.pi) - np.pi # wrap to pi
+    return q_wrapped
+
 class bulletRtdEnv:
 
     def __init__(
@@ -239,8 +243,7 @@ class bulletRtdEnv:
                 self.step(k)
             # TODO: minimize goal position error
             if point == len(waypoints)-1:
-                while np.linalg.norm(self.qpos_sim - waypoint.pos) > 0.2:
-                    breakpoint()
+                while np.linalg.norm(wrap_to_pi(self.qpos_sim) - wrap_to_pi(waypoint.pos)) > 0.1:
                     k, done = self.armtd_plan(waypoint.pos)
                     self.step(k)
                 
