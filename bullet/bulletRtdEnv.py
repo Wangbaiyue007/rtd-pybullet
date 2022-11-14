@@ -211,11 +211,17 @@ class bulletRtdEnv:
             k, done = self.planner_agent.step()
             self.planner_agent.arm3d.render()
         elif self.planner_name == 'armour':
-            k = self.planner_agent.plan(q0=self.qpos_sim, qd0=self.qvel_sim, qdd0=self.qacc_sim, goal=goal)
+            # calculate the goal state of last plan
+            qdes_last = self.planner_agent.get_des_traj(q0=self.q0[-1], qd0=self.qd0[-1], qdd0=self.qdd0[-1], k=self.k[-1], t=0.5)
+            qf_last = qdes_last[:,0]
+            qdf_last = qdes_last[:,1]
+            qddf_last = qdes_last[:,2]
+            # use the goal state of last plan to generate new goal
+            k = self.planner_agent.plan(q0=qf_last, qd0=qdf_last, qdd0=qddf_last, goal=goal)
             self.k = np.append(self.k, np.array([k]), axis=0)
-            self.q0 = np.append(self.q0, np.array([self.qpos_sim]), axis=0)
-            self.qd0 = np.append(self.qd0, np.array([self.qvel_sim]), axis=0)
-            self.qdd0 = np.append(self.qdd0, np.array([self.qacc_sim]), axis=0)
+            self.q0 = np.append(self.q0, np.array([qf_last]), axis=0)
+            self.qd0 = np.append(self.qd0, np.array([qdf_last]), axis=0)
+            self.qdd0 = np.append(self.qdd0, np.array([qddf_last]), axis=0)
             # TODO: done
             done = False
 
@@ -233,7 +239,8 @@ class bulletRtdEnv:
                 self.step(k)
             # TODO: minimize goal position error
             if point == len(waypoints)-1:
-                while np.linalg.norm(self.qpos_sim - waypoint.pos) > 0.1:
+                while np.linalg.norm(self.qpos_sim - waypoint.pos) > 0.2:
+                    breakpoint()
                     k, done = self.armtd_plan(waypoint.pos)
                     self.step(k)
                 
