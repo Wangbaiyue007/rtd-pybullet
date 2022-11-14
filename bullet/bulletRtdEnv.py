@@ -243,7 +243,8 @@ class bulletRtdEnv:
                 self.step(k)
             # TODO: minimize goal position error
             if point == len(waypoints)-1:
-                while np.linalg.norm(wrap_to_pi(self.qpos_sim) - wrap_to_pi(waypoint.pos)) > 0.1:
+                while np.linalg.norm(wrap_to_pi(self.qpos_sim) - wrap_to_pi(waypoint.pos)) > 0.2:
+                    print(f"goal error: {np.linalg.norm(wrap_to_pi(self.qpos_sim) - wrap_to_pi(waypoint.pos))}")
                     k, done = self.armtd_plan(waypoint.pos)
                     self.step(k)
                 
