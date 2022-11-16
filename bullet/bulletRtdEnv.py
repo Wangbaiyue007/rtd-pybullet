@@ -35,7 +35,8 @@ class bulletRtdEnv:
         q0 = [0]*7, 
         qgoal = [0]*7, 
         obs_pos = [[]],
-        obs_size = []
+        obs_size = [[]],
+        obs_ori = [[]]
         ):
 
         ############################## bullet #############################
@@ -84,8 +85,10 @@ class bulletRtdEnv:
         self.scale = [[1, 1, 1]]
 
         # load obstacles
+        if len(obs_ori[0]) == 0:
+            obs_ori = [[0, 0, 0]]*len(obs_pos)
         for i in range(len(obs_pos)):
-            self.load(urdf_path+"/objects/cube_small_zero.urdf", pos= obs_pos[i], scale=obs_size[i], urdf_index=i)
+            self.load(urdf_path+"/objects/cube_small_zero.urdf", pos=obs_pos[i], ori=obs_ori[i], scale=obs_size[i], urdf_index=i)
 
         ############################## planner #############################
         # initialize planner and its environment
@@ -93,6 +96,7 @@ class bulletRtdEnv:
         self.planner_agent = None
         self.obs_pos = obs_pos
         self.obs_size = obs_size
+        self.obs_ori = obs_ori
         self.k = np.array([np.zeros(7)])
         self.q0 = np.array([q0])
         self.qd0 = np.array([np.zeros(7)])
@@ -128,7 +132,7 @@ class bulletRtdEnv:
 
 
     def initialize_armour(self):
-        self.planner_agent = bulletPlanner.ARMOUR(obs_pos=self.obs_pos, obs_size=self.obs_size)
+        self.planner_agent = bulletPlanner.ARMOUR(obs_pos=self.obs_pos, obs_size=self.obs_size, obs_ori=self.obs_ori)
 
     def initialize_zonopy(self, qpos, qgoal, obs_pos, obs_size):
         self.planner_agent = self.planner_agent(q0=qpos, qgoal=qgoal, obs_pos=obs_pos, obs_size=obs_size)

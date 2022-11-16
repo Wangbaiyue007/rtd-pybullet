@@ -15,12 +15,29 @@ def stack_obstacles(obs_pos, obs_size):
 
     return obs_stack
 
+def rotEuler(ori):
+    alpha = ori[0]
+    beta = ori[1]
+    gamma = ori[2]
+    Rz = np.array([[np.cos(gamma), -np.sin(gamma), 0], [np.sin(gamma), np.cos(gamma), 0], [0, 0, 1]])
+    Ry = np.array([[np.cos(beta), 0, np.sin(beta)], [0, 1, 0], [-np.sin(beta), 0, np.cos(beta)]])
+    Rx = np.array([[1, 0, 0], [0, np.cos(alpha), -np.sin(alpha)], [0, np.sin(alpha), np.cos(alpha)]])
+    R = Rz.dot(Ry.dot(Rx))
+    return R
+
 class bulletPlanner:
 
     class ARMOUR:
-        def __init__(self, obs_pos, obs_size):
+        def __init__(self, obs_pos, obs_size, obs_ori):
             import armtd_main_pybind
             obs_stack = stack_obstacles(obs_pos=obs_pos, obs_size=obs_size)
+            # rotate generators if orientation is given
+            if len(obs_ori[0]) != 0:
+                obs_stack = obs_stack.reshape(1, 12*len(obs_ori)).reshape(4*len(obs_ori), 3)
+                for i in range(np.size(obs_ori, axis=0)):
+                    R = rotEuler(obs_ori[i])
+                    obs_stack[4*i+1:4*(i+1), :] = R.dot(obs_stack[4*i+1:4*(i+1), :]).T
+                obs_stack = obs_stack.reshape(len(obs_ori), 12)
             self.planner = armtd_main_pybind.pzsparse(obs_stack)
         
         def plan(self, q0: np.ndarray, qd0: np.ndarray, qdd0: np.ndarray, goal: np.ndarray) -> np.ndarray:

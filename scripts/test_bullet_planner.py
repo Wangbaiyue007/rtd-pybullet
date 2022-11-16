@@ -20,11 +20,13 @@ num_obs = 2
 obs_pos = np.random.uniform(low=[0.2, 0.2, 0.1], high=[0.5, 0.5, 0.5], size=(num_obs,3))
 obs_pos = (-2*np.random.randint(low=0, high=2, size=(num_obs,3)) + 1) * obs_pos + np.array([0, 0, 0.5])
 obs_size = np.random.uniform(low=0.1, high=0.2, size=(num_obs,3))
+obs_ori = np.array([[0, 0, np.pi/4], [0, 0, 0]])
 
 btEnv = bulletRtdEnv(urdf_path=urdf_path, zonopyGUI=useGUI, useGravity=useGravity, \
     useRobot=useRobot, useTorqueControl=useTorqueControl, planner=planner, record=record, \
-    q0=q0, qgoal=qgoal, obs_pos=obs_pos, obs_size=obs_size)
+    q0=q0, qgoal=qgoal, obs_pos=obs_pos, obs_size=obs_size, obs_ori=obs_ori)
 
+breakpoint()
 # simulate tracking from q0 to qgoal
 btEnv.simulate(qgoal)
 
