@@ -43,7 +43,7 @@ for i in [0, 1, 2]:
     for waypoint in btEnv.waypoints: 
         waypoints = np.append(waypoints, [waypoint.pos], axis=0)
     data = {"k" : btEnv.k, "qdd0": btEnv.qdd0, "qd0" : btEnv.qd0, "q0" : btEnv.q0, "waypoints" : waypoints}
-    np.savez("../data/trajectories/traj"+str(i+1)+".npz", **data)
+    np.savez("../data/trajectories/traj_dumbbell"+str(i+1)+".npz", **data)
 
     breakpoint()
     btEnv.Disconnect()

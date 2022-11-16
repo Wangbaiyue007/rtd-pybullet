@@ -59,7 +59,7 @@ class bulletRtdEnv:
 
         self.EnvId = []
         if useRobot:
-            self.robotId = p.loadURDF(urdf_path+'/kinova_gen3_7dof/kinova_with_robotiq_85.urdf', [0, 0, 0], useFixedBase=True)
+            self.robotId = p.loadURDF(urdf_path+'/kinova_gen3_7dof/kinova_with_dumbbell.urdf', [0, 0, 0], useFixedBase=True)
             self.EnvId = [self.robotId]
             # choose the end effector tool frame as end effector index
             self.actuation_index = []
@@ -81,7 +81,7 @@ class bulletRtdEnv:
         for i in range(7):
             self.Kp[i, i] = control_gain*(1-0.15*i)
             self.Kd[i, i] = 1.3*(self.Kp[i, i]/2)**0.5
-        self.path = [urdf_path+'/kinova_gen3_7dof/kinova_with_robotiq_85.urdf']
+        self.path = [urdf_path+'/kinova_gen3_7dof/kinova_with_dumbbell.urdf']
         self.scale = [[1, 1, 1]]
 
         # load obstacles
