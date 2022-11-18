@@ -30,25 +30,18 @@ files_zono = os.listdir(path_to_zono)
 # Initialize simulation
 num_step = 6
 timestep = 0.001
-fetch_env = bulletRtdEnv(urdf_path="../assets/fetch/fetch_arm_new_dumbbell.urdf", timestep=timestep, useGravity=True, useRobot=True, control_gain=10000)
-
-# initialize obstacle positions and robot positions
-for i in range(np.size(obstacle_pos, 0)):
-    fetch_env.load("../assets/objects/cube_small_zero.urdf", pos=obstacle_pos[i], scale=0.1)
-fetch_env.forwardkinematics(joint_pos[0])
+bulletGUI = True
+zonopyGUI = True
+planner = 'zonopy'
+blender_record = True
+fetch_env = bulletRtdEnv(urdf_path="../assets", bulletGUI=bulletGUI, zonopyGUI=zonopyGUI, \
+    planner=planner, blender_record=blender_record, q0=joint_pos[0], obs_pos=obstacle_pos, obs_size=obstacle_scale, \
+    timestep=timestep, control_gain=10000)
 
 # initialize renderer
-recorder = PyBulletRecorder()
 recorder_zono = PyBulletRecorder()
 recorder_zono_slc = PyBulletRecorder()
-# register robot
-recorder.register_object(fetch_env.EnvId[0], fetch_env.path[0])
-# register obstacles with correct scale
-for i in range(1, len(fetch_env.EnvId)):
-    recorder.register_object(fetch_env.EnvId[i], fetch_env.path[i], obstacle_scale[i-1])
 
-qpos = joint_pos[0]
-qvel = np.zeros(7)
 q_record = np.zeros([np.size(joint_pos, 0), 7])
 q_des_record = np.zeros([np.size(joint_pos, 0), 7])
 t_record = np.arange(0, 0.01*np.size(joint_pos, 0), 0.01)
@@ -69,23 +62,8 @@ for step in range(num_step):
 
     # control loop
     dataIndex = int(50 * step)
-    for t in range(int(0.5/timestep)):
-        if t % 10 == 0: 
-            dataIndex += 1
-            # qacc_d = (joint_vel[dataIndex]-joint_vel[dataIndex-1])/0.01
-            qacc_d = joint_acc[dataIndex-1]
-            q, _ = fetch_env.get_joint_states()
-            q_record[dataIndex-1] = q
-            q_des_record[dataIndex-1] = qpos
-        qpos, qvel = fetch_env.get_joint_traj(qpos, qvel, qacc_d)
-        torque = fetch_env.inversedynamics(qpos, qvel, qacc_d)
-        fetch_env.torque_control(torque)
-        pbt.stepSimulation()
-        time.sleep(timestep)
-        # record the video at 50 fps
-        if t%20 == 0: 
-            recorder.add_keyframe()
-
+    fetch_env.step(joint_acc[dataIndex-1])
+    
     # dump recording and reset
     recorder_zono.save("../data/pkl/matlab_zono_step"+str(step+1)+".pkl")
     recorder_zono_slc.save("../data/pkl/matlab_zono_step"+str(step+1)+"_slc.pkl")
@@ -100,12 +78,11 @@ for step in range(num_step):
         fetch_env.remove_body(Id)
         recorder_zono_slc.unregister_object(Id)
 
-plt.plot(t_record[:-1], q_des_record[:-1], 'r--', label='q_desired')
-plt.plot(t_record[:-1], q_record[:-1], 'b-', label='q')
+plt.plot(t_record[:-1], fetch_env.qpos_des_record[:-1], 'r--', label='q_desired')
+plt.plot(t_record[:-1], fetch_env.qpos_record[:-1], 'b-', label='q')
 plt.xlabel('time/s')
 plt.ylabel('position/rad')
 plt.legend()
 plt.show()
 
-recorder.save("../data/pkl/matlab_fetch.pkl")
 fetch_env.Disconnect()

@@ -7,6 +7,7 @@ from zonopy.optimize.armtd_3d import ARMTD_3D_planner
 import os
 import math as m
 
+# this is important
 def save_zono(env:Arm_3D):
     for i in range(env.n_links):
         FO_poly = np.empty((1,3))

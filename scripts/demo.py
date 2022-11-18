@@ -25,7 +25,7 @@ obs_size = np.array([[0.3175, 0.3175, 0.34], [0.3175, 0.3175, 0.34], [0.3175, 0.
 rack_pos = np.array([[-0.3, 0., 0.5], [0.8, 0, 1], [1, -0.7, 0], [1, 0.81, 0]])
 rack_size = np.array([[0.01, 2, 2], [2, 2, 0.01], [2, 0.01, 2], [2, 0.01, 2]])
 
-for i in [2]:
+for i in [0, 1, 2]:
     obs_pos_i = np.append([obs_pos[i]], rack_pos, axis=0)
     obs_size_i = np.append([obs_size[i]], rack_size, axis=0)
     btEnv = bulletRtdEnv(urdf_path=urdf_path, zonopyGUI=useGUI, useGravity=useGravity, \
