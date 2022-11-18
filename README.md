@@ -14,12 +14,14 @@ It would be a good idea to install the python code in a virtual environment usin
 This installation assumes that you have correctly compiled [`armour`](https://github.com/roahmlab/armtd-dev)'s *dependencies*, which includes [`ipopt`](https://coin-or.github.io/Ipopt/).
 
 ### External Dependencies
-- [`pybullet`](https://github.com/bulletphysics/bullet3)([documentation](https://pybullet.org/wordpress/index.php/forum-2/))
+[`rtd-pybullet`] has a number of dependencies.  To generate nice visuals, you'll need Blender:
+
 - [`blender`](https://www.blender.org/)
-- [`pybullet-blender-recorder`](https://github.com/huy-ha/pybullet-blender-recorder)
-- [`pytorch`](https://github.com/pytorch/pytorch)
-- [`pymeshlab`](https://pymeshlab.readthedocs.io/en/latest/)
-- [`object2urdf`](https://github.com/harvard-microrobotics/object2urdf)
+- [`pybullet-blender-recorder`](https://github.com/huy-ha/pybullet-blender-recorder) 
+
+There are also a number of python dependencies that can be installed by 
+
+  pip install -r requirements.txt
 
 ### Included as submodules
 - [`zonopy`](https://github.com/roahmlab/zonopy)
