@@ -21,7 +21,7 @@ This installation assumes that you have correctly compiled [`armour`](https://gi
 
 There are also a number of python dependencies that can be installed by 
 
-     pip install -r requirements.txt s
+     pip install -r requirements.txt
 
 ### Included as submodules
 - [`zonopy`](https://github.com/roahmlab/zonopy)
