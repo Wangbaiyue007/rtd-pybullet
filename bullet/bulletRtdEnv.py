@@ -124,8 +124,10 @@ class bulletRtdEnv:
         ############################## blender #############################
         self.blender_record = blender_record
         self.blender = PyBulletRecorder()
+        self.blender_waypoints = PyBulletRecorder()
         # register robot
         self.blender.register_object(self.EnvId[0], self.path[0])
+        self.blender_waypoints.register_object(self.EnvId[0], self.path[0])
         # register obstacles with correct scale
         for i in range(1, len(self.EnvId)):
             self.blender.register_object(self.EnvId[i], self.path[i], obs_size[i-1])
@@ -206,6 +208,7 @@ class bulletRtdEnv:
             joint_node = node.pos
             euclidean_node = self.forwardkinematics(joint_node)
             p.addUserDebugPoints(pointPositions=[euclidean_node[0:3].tolist()], pointColorsRGB=[[0.2, 0.2, 1.0]], pointSize=10)  
+            self.blender_waypoints.add_keyframe()
 
         # return to the start position
         self.forwardkinematics(self.qpos_sim)
@@ -484,7 +487,8 @@ class bulletRtdEnv:
         return Id
 
     def dump_video(self, filename):
-        self.blender.save(filename)
+        self.blender.save(filename+'.pkl')
+        self.blender_waypoints.save(filename+'_waypoints.pkl')
     
     def remove_body(self, bodyId):
         p.removeBody(bodyId)
