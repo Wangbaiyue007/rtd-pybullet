@@ -16,6 +16,8 @@ It would be a good idea to install the python code in a virtual environment usin
 - [`blender`](https://www.blender.org/)
 - [`pybullet-blender-recorder`](https://github.com/huy-ha/pybullet-blender-recorder)
 - [`pytorch`](https://github.com/pytorch/pytorch)
+- [`pymeshlab`](https://pymeshlab.readthedocs.io/en/latest/)
+- [`object2urdf`](https://github.com/harvard-microrobotics/object2urdf)
 
 ### Included as submodules
 - [`zonopy`](https://github.com/roahmlab/zonopy)
