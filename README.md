@@ -11,6 +11,8 @@ Running RTD ([Autonomous Reachability-based Manipulator Trajectory Design](https
 ## Installation
 It would be a good idea to install the python code in a virtual environment using using either [`conda`](https://docs.conda.io/en/latest/) or [`venv`](https://docs.python.org/3/library/venv.html).
 
+This installation assumes that you have correctly compiled [`armour`](https://github.com/roahmlab/armtd-dev)'s dependencies, which includes [`ipopt`](https://coin-or.github.io/Ipopt/).
+
 ### External Dependencies
 - [`pybullet`](https://github.com/bulletphysics/bullet3)([documentation](https://pybullet.org/wordpress/index.php/forum-2/))
 - [`blender`](https://www.blender.org/)
