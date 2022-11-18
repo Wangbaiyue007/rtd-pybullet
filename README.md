@@ -14,7 +14,7 @@ It would be a good idea to install the python code in a virtual environment usin
 This installation assumes that you have correctly compiled [`armour`](https://github.com/roahmlab/armtd-dev)'s *dependencies*, which includes [`ipopt`](https://coin-or.github.io/Ipopt/).
 
 ### External Dependencies
-[`rtd-pybullet`] has a number of dependencies.  To generate nice visuals, you'll need Blender:
+[`rtd-pybullet`](https://github.com/roahmlab/rtd-pybullet) has a number of dependencies.  To generate nice visuals, you'll need Blender:
 
 - [`blender`](https://www.blender.org/)
 - [`pybullet-blender-recorder`](https://github.com/huy-ha/pybullet-blender-recorder) 
