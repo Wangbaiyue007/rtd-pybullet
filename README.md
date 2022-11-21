@@ -74,3 +74,6 @@ The pre-computed trajectories are discrete time and are assumed to be perfect tr
 ### V. Render animation using Blender
 With all the `.pkl` files, it is easy to do the rendering by importing them to Blender. Check out the instructions [here](https://github.com/huy-ha/pybullet-blender-recorder).
 
+# TODO
+- [ ] Improve the installation instructions
+- [ ] Remove ARMOUR and zonopy as submodules
