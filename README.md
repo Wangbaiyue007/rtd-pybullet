@@ -11,11 +11,17 @@ Running RTD ([Autonomous Reachability-based Manipulator Trajectory Design](https
 ## Installation
 It would be a good idea to install the python code in a virtual environment using using either [`conda`](https://docs.conda.io/en/latest/) or [`venv`](https://docs.python.org/3/library/venv.html).
 
+This installation assumes that you have correctly compiled [`armour`](https://github.com/roahmlab/armtd-dev)'s *dependencies*, which includes [`ipopt`](https://coin-or.github.io/Ipopt/).
+
 ### External Dependencies
-- [`pybullet`](https://github.com/bulletphysics/bullet3)([documentation](https://pybullet.org/wordpress/index.php/forum-2/))
+[`rtd-pybullet`](https://github.com/roahmlab/rtd-pybullet) has a number of dependencies.  To generate nice visuals, you'll need Blender:
+
 - [`blender`](https://www.blender.org/)
-- [`pybullet-blender-recorder`](https://github.com/huy-ha/pybullet-blender-recorder)
-- [`pytorch`](https://github.com/pytorch/pytorch)
+- [`pybullet-blender-recorder`](https://github.com/huy-ha/pybullet-blender-recorder) 
+
+There are also a number of python dependencies that can be installed by 
+
+     pip install -r requirements.txt
 
 ### Included as submodules
 - [`zonopy`](https://github.com/roahmlab/zonopy)
@@ -68,3 +74,6 @@ The pre-computed trajectories are discrete time and are assumed to be perfect tr
 ### V. Render animation using Blender
 With all the `.pkl` files, it is easy to do the rendering by importing them to Blender. Check out the instructions [here](https://github.com/huy-ha/pybullet-blender-recorder).
 
+# TODO
+- [ ] Improve the installation instructions
+- [ ] Remove ARMOUR and zonopy as submodules
