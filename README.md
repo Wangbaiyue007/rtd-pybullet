@@ -48,6 +48,9 @@ Look at the Blender documentation for installing plugins on Windows or MacOS.
     cd armtd-dev/cuda-dev/PZsparse-Bernstein/build
     cmake ..
     make
+
+If the above doesn't work, there might be an issue with using `Pybind11` as a submodule. You can get around this by installing it using pip.
+    
 We need to add the path to `PYTHONPATH` so that python can find the pybind module created by CMake.
 
     export PYTHONPATH=$PYTHONPATH:$PWD
