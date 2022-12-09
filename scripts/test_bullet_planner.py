@@ -29,6 +29,7 @@ btEnv = bulletRtdEnv(urdf_path=urdf_path, zonopyGUI=useGUI, useGravity=useGravit
 breakpoint()
 # simulate tracking from q0 to qgoal
 btEnv.simulate(qgoal)
+btEnv.dump_traj('../data/trajectories/ARMOUR_1208.npz')
 
 # plotting
 plotTraj(btEnv)

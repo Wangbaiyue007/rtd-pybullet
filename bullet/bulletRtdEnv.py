@@ -22,6 +22,7 @@ class bulletRtdEnv:
     def __init__(
         self, 
         urdf_path="../assets", 
+        reachset_path="",
         bulletGUI=True, 
         zonopyGUI=True,
         timestep=0.001, 
@@ -213,7 +214,7 @@ class bulletRtdEnv:
         # return to the start position
         self.forwardkinematics(self.qpos_sim)
 
-    def armtd_plan(self, goal: np.ndarray):
+    def armtd_plan(self, goal: np.ndarray, step: int):
         """
         Plan for 1 planning iteration of ARMTD
         """
@@ -228,7 +229,7 @@ class bulletRtdEnv:
             qdf_last = qdes_last[:,1]
             qddf_last = qdes_last[:,2]
             # use the goal state of last plan to generate new goal
-            k = self.planner_agent.plan(q0=qf_last, qd0=qdf_last, qdd0=qddf_last, goal=goal)
+            k = self.planner_agent.plan(q0=qf_last, qd0=qdf_last, qdd0=qddf_last, goal=goal, step=step)
             self.k = np.append(self.k, np.array([k]), axis=0)
             self.q0 = np.append(self.q0, np.array([qf_last]), axis=0)
             self.qd0 = np.append(self.qd0, np.array([qdf_last]), axis=0)
@@ -246,13 +247,14 @@ class bulletRtdEnv:
             print("point: ", point)
             waypoint = waypoints[point]
             for _ in range(1):
-                k, done = self.armtd_plan(waypoint.pos)
+                k, done = self.armtd_plan(waypoint.pos, point)
                 self.step(k)
             if point == len(waypoints)-1:
                 while np.linalg.norm(wrap_to_pi(self.qpos_sim) - wrap_to_pi(waypoint.pos)) > 0.2:
+                    point += 1
                     print(f"goal error: {np.linalg.norm(wrap_to_pi(self.qpos_sim) - wrap_to_pi(waypoint.pos))}")
-                    breakpoint()
-                    k, done = self.armtd_plan(waypoint.pos)
+                    # breakpoint()
+                    k, done = self.armtd_plan(waypoint.pos, point)
                     self.step(k)
                 
         return done
@@ -489,6 +491,14 @@ class bulletRtdEnv:
     def dump_video(self, filename):
         self.blender.save(filename+'.pkl')
         self.blender_waypoints.save(filename+'_waypoints.pkl')
+
+    def dump_traj(self, filename):
+        assert self.record is True, 'Record option not set to true.'
+        waypoints = np.array([self.qpos_record[0]])
+        for waypoint in self.waypoints: 
+            waypoints = np.append(waypoints, [waypoint.pos], axis=0)
+        data = {"k" : self.k, "qdd0": self.qdd0, "qd0" : self.qd0, "q0" : self.q0, "waypoints" : waypoints}
+        np.savez(filename+".npz", **data)
     
     def remove_body(self, bodyId):
         p.removeBody(bodyId)

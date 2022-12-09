@@ -1,5 +1,6 @@
 import torch
 import numpy as np
+import shutil
 
 def stack_obstacles(obs_pos, obs_size):
     """
@@ -40,11 +41,14 @@ class bulletPlanner:
                 obs_stack = obs_stack.reshape(len(obs_ori), 12)
             self.planner = armtd_main_pybind.pzsparse(obs_stack)
         
-        def plan(self, q0: np.ndarray, qd0: np.ndarray, qdd0: np.ndarray, goal: np.ndarray) -> np.ndarray:
+        def plan(self, q0: np.ndarray, qd0: np.ndarray, qdd0: np.ndarray, goal: np.ndarray, step: int) -> np.ndarray:
             """
             Return Berenstein coefficients
             """
             k_opt = self.planner.optimize(q0, qd0, qdd0, goal)
+            # copy reachset data
+            for link in range(8): 
+                shutil.copy(f'../armtd-dev/cuda-dev/PZsparse-Bernstein/reachsets/reachset{link}.txt', f'../data/ARMOUR/reachsets/step_{step+1}_link_{link}.txt')
             return k_opt
 
         def get_des_traj(self, q0: np.ndarray, qd0: np.ndarray, qdd0: np.ndarray, k:np.ndarray, t: float) -> np.ndarray:

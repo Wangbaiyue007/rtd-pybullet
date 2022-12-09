@@ -1,6 +1,9 @@
 data/ARMTD_matlab/matlab_sim
 data/ARMTD_matlab/*.mat
 data/ARMTD_zonopy/zonopy_sim
+data/ARMOUR/reachsets/
+data/pkl/ARMOUR/
+data/pkl/zonopy/
 assets/zonotope/meshes_matlab
 assets/zonotope/meshes_zonopy
 *.asv

@@ -4,7 +4,7 @@ from object2urdf import ObjectUrdfBuilder
 import getopt, sys
  
 argumentList = sys.argv[1:]
-options = "zm:"
+options = "m:"
 
 def convert_mesh(inputfile, outputfile):
     # create a new mesh set
@@ -29,12 +29,10 @@ def main():
     try:
         arguments, _ = getopt.getopt(argumentList, options)
         for currentArgument, currentValue in arguments:
-            if currentArgument == "-z":
-                print ("Converting stl files to urdf from zonopy ...")
-                stl2urdf('../assets/zonotope/meshes_zonopy/')
             if currentArgument == "-m":
-                print ("Converting stl files to urdf from matlab ...")
-                stl2urdf('../assets/zonotope/meshes_matlab/')
+                assert type(currentValue) == str, 'Input argument must be a directory that contains stl files.'
+                print ("Converting stl files to urdf ...")
+                stl2urdf(currentValue)
     except getopt.error as err:
         print (str(err))
 
