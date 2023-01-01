@@ -327,6 +327,8 @@
   </link>
 
   <joint name="gripper_right_spring_link_joint" type="fixed">
+    <!-- This is modified -->
+    <!-- <origin rpy="3.1416 0 0.6983" xyz="0.0127 -0.061307 0"/> -->
     <origin rpy="3.1416 0 0.392699" xyz="0.0127 -0.061307 0"/>
     <parent link="gripper_base"/>
     <child link="gripper_right_spring_link"/>
@@ -358,6 +360,8 @@
   </link>
 
   <joint name="gripper_left_spring_link_joint" type="fixed">
+    <!-- This is modified -->
+    <!-- <origin rpy="3.1416 0 -0.70092" xyz="-0.0127 -0.061307 0"/> -->
     <origin rpy="3.1416 0 -0.392699" xyz="-0.0127 -0.061307 0"/>
     <parent link="gripper_base"/>
     <child link="gripper_left_spring_link"/>
@@ -389,7 +393,9 @@
   </link>
 
   <joint name="gripper_right_driver_joint" type="fixed">
-    <origin rpy="3.1416 0 -1.5707" xyz="0.030601 -0.054792 0"/>
+    <!-- This is modified -->
+    <!-- <origin rpy="3.1416 0 -0.019735" xyz="0.030601 -0.054792 0"/> -->
+    <origin rpy="3.1416 0 -1.5" xyz="0.030601 -0.054792 0"/>
     <parent link="gripper_base"/>
     <child link="gripper_right_driver"/>
     <axis xyz="0 0 1"/>
@@ -420,7 +426,9 @@
   </link>
 
   <joint name="gripper_right_coupler_joint" type="fixed">
-    <origin rpy="0 0 -1.5707" xyz="0.031486 -0.0040855 0"/>
+    <!-- This is modified  -->
+    <!-- <origin rpy="0 0 -0.25804" xyz="0.031486 -0.0040855 0"/> -->
+    <origin rpy="0 0 -1.53" xyz="0.031486 -0.0040855 0"/>
     <parent link="gripper_right_driver"/>
     <child link="gripper_right_coupler"/>
     <axis xyz="0 0 -1"/>
@@ -451,6 +459,8 @@
   </link>
 
   <joint name="gripper_right_follower_joint" type="fixed">
+    <!-- This is modified -->
+    <!-- <origin rpy="3.1416 0 -2.9033" xyz="-0.0061148 0.047125 0"/> -->
     <origin rpy="3.1416 0 3.1416" xyz="-0.0061148 0.047125 0"/>
     <parent link="gripper_right_coupler"/>
     <child link="gripper_right_follower"/>
@@ -512,7 +522,9 @@
   </link>
 
   <joint name="gripper_left_driver_joint" type="fixed">
-    <origin rpy="0 0 -1.5707" xyz="-0.030601 -0.054792 0"/>
+    <!-- This is modified -->
+    <!-- <origin rpy="0 0 -3.1245" xyz="-0.030601 -0.054792 0"/> -->
+    <origin rpy="0 0 -1.5" xyz="-0.030601 -0.054792 0"/>
     <parent link="gripper_base"/>
     <child link="gripper_left_driver"/>
     <axis xyz="0 0 1"/>
@@ -543,7 +555,9 @@
   </link>
 
   <joint name="gripper_left_coupler_joint" type="fixed">
-    <origin rpy="3.1416 0 1.5707" xyz="0.031486 -0.0040855 0"/>
+    <!-- This is modified -->
+    <!-- <origin rpy="3.1416 0 -3.1416" xyz="0.031486 -0.0040855 0"/> -->
+    <origin rpy="3.1416 0 1.56" xyz="0.031486 -0.0040855 0"/>
     <parent link="gripper_left_driver"/>
     <child link="gripper_left_coupler"/>
     <axis xyz="0 0 1"/>
@@ -574,6 +588,8 @@
   </link>
 
   <joint name="gripper_left_follower_joint" type="fixed">
+    <!-- This is modified -->
+    <!-- <origin rpy="0 0 0.017192" xyz="-0.0061148 0.047125 0"/> -->
     <origin rpy="0 0 0" xyz="-0.0061148 0.047125 0"/>
     <parent link="gripper_left_coupler"/>
     <child link="gripper_left_follower"/>
