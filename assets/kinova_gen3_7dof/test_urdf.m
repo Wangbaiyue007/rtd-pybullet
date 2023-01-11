@@ -11,15 +11,19 @@ robot_approx.Gravity = [0 0 -9.8];
 robot_approx.DataFormat = 'column';
 
 %% testing
-q = randomConfiguration(robot_original);
-qd = 0.5 - rand(7,1);
-tau = 0.5 - rand(7,1);
-figure(1);
-show(robot_original, q);
-figure(2);
-show(robot_approx, q);
-
-qdd_original = forwardDynamics(robot_original, q, qd, tau);
-qdd_approx = forwardDynamics(robot_approx, q, qd, tau);
-error = norm(qdd_original - qdd_approx)/norm(qdd_original);
-disp(error)
+err = [];
+for i = 1:10000
+    q = randomConfiguration(robot_original);
+    % figure(1);
+    % show(robot_original, q, 'Visuals', 'on', 'Collisions', 'off');
+    % figure(2);
+    % show(robot_approx, q, 'Visuals', 'on', 'Collisions', 'off');
+    
+    mass_original = massMatrix(robot_original, q);
+    mass_approx = massMatrix(robot_approx, q);
+    error = norm(mass_original - mass_approx)/norm(mass_original);
+    disp(error)
+    err = [err error];
+end
+error_mean = mean(err);
+disp(error_mean);
