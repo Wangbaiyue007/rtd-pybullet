@@ -119,7 +119,7 @@ class bulletRtdEnv:
             self.planner_agentGUI = zonopyGUI
             self.planner_agent = bulletPlanner.Zonopy(q0=q0, qgoal=self.qgoal, obs_pos=obs_pos, obs_size=obs_size)
         elif planner == 'armour':
-            # self.zonopy = bulletPlanner.Zonopy(q0=q0, qgoal=self.qgoal, obs_pos=obs_pos, obs_size=obs_size)
+            # self.zonopy = bulletPlanner.Zonopy(q0=q0, qgoal=self.qgoal, obs_pos=obs_pos, obs_size=obs_size) 
             self.initialize_armour()
 
         ############################## blender #############################
