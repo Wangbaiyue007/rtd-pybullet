@@ -60,7 +60,7 @@ class bulletRtdEnv:
 
         self.EnvId = []
         if useRobot:
-            self.robotId = p.loadURDF(urdf_path+'/kinova_gen3_7dof/kinova_with_gripper.urdf', [0, 0, 0], useFixedBase=True)
+            self.robotId = p.loadURDF(urdf_path+'/kinova_gen3_7dof/kinova_with_gripper_dumbbell.urdf', [0, 0, 0], useFixedBase=True)
             self.EnvId = [self.robotId]
             # choose the end effector tool frame as end effector index
             self.actuation_index = []
@@ -82,7 +82,7 @@ class bulletRtdEnv:
         for i in range(7):
             self.Kp[i, i] = controlGain*(1-0.15*i)
             self.Kd[i, i] = 1.3*(self.Kp[i, i]/2)**0.5
-        self.path = [urdf_path+'/kinova_gen3_7dof/kinova_with_gripper.urdf']
+        self.path = [urdf_path+'/kinova_gen3_7dof/kinova_with_gripper_dumbbell.urdf']
         self.scale = [[1, 1, 1]]
 
         # load obstacles
@@ -140,7 +140,7 @@ class bulletRtdEnv:
     def initialize_zonopy(self, qpos, qgoal, obs_pos, obs_size):
         self.planner_agent = self.planner_agent(q0=qpos, qgoal=qgoal, obs_pos=obs_pos, obs_size=obs_size)
 
-    def step(self, ka: np.ndarray, qpos=[], qvel=[]):
+    def step(self, ka: np.ndarray, qpos=[], qvel=[], qacc=[], stop=False):
         """
         Step for 1 planning iteration (0.5 s) in pybullet
         """
@@ -159,6 +159,7 @@ class bulletRtdEnv:
             elif self.planner_name == 'armour':
                 # calculate desired trajectory: Bezier curve
                 t = self.timestep * i
+                if stop is True: t += 0.5
                 qdes = self.planner_agent.get_des_traj(q0=qpos, qd0=qvel, qdd0=qacc, k=ka, t=t)
                 torque = self.inversedynamics(qdes[:,0], qdes[:,1], qdes[:,2])
             self.torque_control(torque)
