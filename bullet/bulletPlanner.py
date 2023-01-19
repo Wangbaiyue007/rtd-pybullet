@@ -30,7 +30,8 @@ class bulletPlanner:
 
     class ARMOUR:
         def __init__(self, obs_pos, obs_size, obs_ori):
-            import armtd_main_pybind
+            # import armtd_main_pybind
+            import armour_main_pybind
             obs_stack = stack_obstacles(obs_pos=obs_pos, obs_size=obs_size)
             # rotate generators if orientation is given
             if len(obs_ori[0]) != 0:
@@ -39,7 +40,8 @@ class bulletPlanner:
                     R = rotEuler(obs_ori[i])
                     obs_stack[4*i+1:4*(i+1), :] = R.dot(obs_stack[4*i+1:4*(i+1), :]).T
                 obs_stack = obs_stack.reshape(len(obs_ori), 12)
-            self.planner = armtd_main_pybind.pzsparse(obs_stack)
+            # self.planner = armtd_main_pybind.pzsparse(obs_stack)
+            self.planner = armour_main_pybind.pzsparse(obs_stack)
         
         def plan(self, q0: np.ndarray, qd0: np.ndarray, qdd0: np.ndarray, goal: np.ndarray, step: int) -> np.ndarray:
             """
@@ -47,8 +49,8 @@ class bulletPlanner:
             """
             k_opt = self.planner.optimize(q0, qd0, qdd0, goal)
             # copy reachset data
-            for link in range(8): 
-                shutil.copy(f'../armtd-dev/cuda-dev/PZsparse-Bernstein/reachsets/reachset{link}.txt', f'../data/ARMOUR/reachsets/step_{step+1}_link_{link}.txt')
+            # for link in range(8): 
+            #     shutil.copy(f'../armtd-dev/cuda-dev/PZsparse-Bernstein/reachsets/reachset{link}.txt', f'../data/ARMOUR/reachsets/step_{step+1}_link_{link}.txt')
             return k_opt
 
         def get_des_traj(self, q0: np.ndarray, qd0: np.ndarray, qdd0: np.ndarray, k:np.ndarray, t: float) -> np.ndarray:
@@ -131,3 +133,11 @@ class bulletPlanner:
             self.ka = qacc
 
             return qacc, done
+        
+        def free(self):
+            """
+            Free GPU memory
+            """
+            import gc
+            gc.collect()
+            torch.cuda.empty_cache()
