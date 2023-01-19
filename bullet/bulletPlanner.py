@@ -49,8 +49,9 @@ class bulletPlanner:
             """
             k_opt = self.planner.optimize(q0, qd0, qdd0, goal)
             # copy reachset data
-            # for link in range(8): 
-            #     shutil.copy(f'../armtd-dev/cuda-dev/PZsparse-Bernstein/reachsets/reachset{link}.txt', f'../data/ARMOUR/reachsets/step_{step+1}_link_{link}.txt')
+            for link in range(8): 
+                shutil.copy(f'../armour-dev/kinova_src/kinova_simulator_interfaces/kinova_planner_realtime/reachsets/armour_joint_position_center.out', f'../data/ARMOUR/reachsets/step_{step+1}_center.txt')
+                shutil.copy(f'../armour-dev/kinova_src/kinova_simulator_interfaces/kinova_planner_realtime/reachsets/armour_joint_position_radius.out', f'../data/ARMOUR/reachsets/step_{step+1}_radius.txt')
             return k_opt
 
         def get_des_traj(self, q0: np.ndarray, qd0: np.ndarray, qdd0: np.ndarray, k:np.ndarray, t: float) -> np.ndarray:
