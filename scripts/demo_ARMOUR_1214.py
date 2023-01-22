@@ -121,8 +121,8 @@ for number in range(3):
     q0 = btEnv.qpos_record[-1]
 
     # save data
-    btEnv.dump_video(f'../data/trajectories/ARMOUR_1214_{number+1}')
-    btEnv.dump_traj(f'../data/trajectories/ARMOUR_1214_{number+1}')
+    btEnv.dump_video(f'../data/trajectories/ARMOUR_0120_{number+1}')
+    btEnv.dump_traj(f'../data/trajectories/ARMOUR_0120_{number+1}')
 
     breakpoint()
     btEnv.Disconnect()

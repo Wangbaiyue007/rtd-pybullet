@@ -17,6 +17,24 @@ def wrap_to_pi(q: np.ndarray):
     q_wrapped = (q + np.pi) % (2 * np.pi) - np.pi # wrap to pi
     return q_wrapped
 
+def bernstein_q_des(q0, qd0, qdd0, k, t):
+    def pow(x,y):
+        return x ** y
+    B0 = -pow(t - 1, 5)
+    B1 = 5 * t * pow(t - 1, 4)
+    B2 = -10 * pow(t, 2) * pow(t - 1, 3)
+    B3 = 10 * pow(t, 3) * pow(t - 1, 2)
+    B4 = -5 * pow(t, 4) * (t - 1)
+    B5 = pow(t, 5)
+    beta0 = q0
+    beta1 = q0 + qd0 / 5
+    beta2 = q0 + (2 * qd0) / 5 + qdd0 / 20
+    beta3 = q0 + k
+    beta4 = q0 + k
+    beta5 = q0 + k
+    return (B0 * beta0 + B1 * beta1 + B2 * beta2 + B3 * beta3 + B4 * beta4 +
+            B5 * beta5)
+
 class bulletRtdEnv:
 
     def __init__(
@@ -251,9 +269,9 @@ class bulletRtdEnv:
                 k, done = self.armtd_plan(waypoint.pos, point)
                 self.step(k)
             if point == len(waypoints)-1:
-                while np.linalg.norm(wrap_to_pi(self.qpos_sim) - wrap_to_pi(waypoint.pos)) > 0.2:
+                while np.linalg.norm(wrap_to_pi(bernstein_q_des(self.q0[-1], self.qd0[-1], self.qdd0[-1], k, 1)) - wrap_to_pi(waypoint.pos)) > 0.2:
                     point += 1
-                    print(f"goal error: {np.linalg.norm(wrap_to_pi(self.qpos_sim) - wrap_to_pi(waypoint.pos))}")
+                    print(f"goal error: {np.linalg.norm(wrap_to_pi(bernstein_q_des(self.q0[-1], self.qd0[-1], self.qdd0[-1], k, 1)) - wrap_to_pi(waypoint.pos))}")
                     # breakpoint()
                     k, done = self.armtd_plan(waypoint.pos, point)
                     self.step(k)
