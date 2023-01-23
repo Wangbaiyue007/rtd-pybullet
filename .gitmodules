@@ -4,3 +4,6 @@
 [submodule "armtd-dev"]
 	path = armtd-dev
 	url = git@github.com:roahmlab/armtd-dev.git
+[submodule "armour-dev"]
+	path = armour-dev
+	url = git@github.com:roahmlab/armour-dev.git
