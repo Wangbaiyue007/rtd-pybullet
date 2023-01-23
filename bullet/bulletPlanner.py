@@ -45,7 +45,7 @@ class bulletPlanner:
         
         def plan(self, q0: np.ndarray, qd0: np.ndarray, qdd0: np.ndarray, goal: np.ndarray, step: int) -> np.ndarray:
             """
-            Return Berenstein coefficients
+            Return Berenstein coefficients. Return an array of zeros if there is no feasible solution.
             """
             k_opt = self.planner.optimize(q0, qd0, qdd0, goal)
             # copy reachset data

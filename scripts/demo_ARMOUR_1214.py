@@ -97,25 +97,26 @@ for number in range(3):
         q0=q0, qgoal=qpos[number+1], obs_pos=obs_pos_i, obs_size=obs_size_i, obs_ori=obs_ori_i)
 
     # simulate tracking from q0 to qgoal
-    btEnv.plot_waypoints(waypoints)
-    btEnv.waypoints = waypoints
-    k = 0
-    for i in range(100):
-        # last waypoint, minimize error
-        if  i + 1 >= len(waypoints):
-            dist_error: float = np.linalg.norm(wrap_to_pi(bernstein_q_des(btEnv.q0[-1], btEnv.qd0[-1], btEnv.qdd0[-1], k, 1)) - wrap_to_pi(qpos[number+1]))
-            if dist_error > 0.2:
-                print(f"minimizing error: {dist_error}")
-                k, done = btEnv.armtd_plan(waypoints[-1].pos, i)
-            else:
-                q0_last = btEnv.q0[-1]
-                qd0_last = btEnv.qd0[-1]
-                qdd0_last = btEnv.qdd0[-1]
-                btEnv.step(k, qpos=q0_last, qvel=qd0_last, qacc=qdd0_last, stop=True)
-                break
-        else:
-            k, done = btEnv.armtd_plan(waypoints[i].pos, i)
-        btEnv.step(k)
+    # btEnv.plot_waypoints(waypoints)
+    # btEnv.waypoints = waypoints
+    # k = 0
+    # for i in range(100):
+    #     # last waypoint, minimize error
+    #     if  i + 1 >= len(waypoints):
+    #         dist_error: float = np.linalg.norm(wrap_to_pi(bernstein_q_des(btEnv.q0[-1], btEnv.qd0[-1], btEnv.qdd0[-1], k, 1)) - wrap_to_pi(qpos[number+1]))
+    #         if dist_error > 0.2:
+    #             print(f"minimizing error: {dist_error}")
+    #             k, done = btEnv.armtd_plan(waypoints[-1].pos, i)
+    #         else:
+    #             q0_last = btEnv.q0[-1]
+    #             qd0_last = btEnv.qd0[-1]
+    #             qdd0_last = btEnv.qdd0[-1]
+    #             btEnv.step(k, qpos=q0_last, qvel=qd0_last, qacc=qdd0_last, stop=True)
+    #             break
+    #     else:
+    #         k, done = btEnv.armtd_plan(waypoints[i].pos, i)
+    #     btEnv.step(k)
+    btEnv.simulate(qpos[number+1])
 
     # use last position as the next start position
     q0 = btEnv.qpos_record[-1]

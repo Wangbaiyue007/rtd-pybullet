@@ -237,9 +237,10 @@ class bulletRtdEnv:
         """
         Plan for 1 planning iteration of ARMTD
         """
+        break_robot = False
         if self.planner_name == 'zonopy':
             self.planner_agent.arm3d.qgoal = torch.tensor(goal, dtype=self.planner_agent.arm3d.dtype, device=self.planner_agent.arm3d.device)
-            k, done = self.planner_agent.step()
+            k, _ = self.planner_agent.step()
             self.planner_agent.arm3d.render()
         elif self.planner_name == 'armour':
             # calculate the goal state of last plan
@@ -253,10 +254,12 @@ class bulletRtdEnv:
             self.q0 = np.append(self.q0, np.array([qf_last]), axis=0)
             self.qd0 = np.append(self.qd0, np.array([qdf_last]), axis=0)
             self.qdd0 = np.append(self.qdd0, np.array([qddf_last]), axis=0)
-            # TODO: done
-            done = False
+            # if there is no feasible solution, then return last plan
+            if np.linalg.norm(k) == 0:
+                k = self.k[-2]
+                break_robot = True
 
-        return k, done
+        return k, break_robot
 
     def _armtd_track(self, waypoints: List[Node]):
         """
@@ -266,17 +269,17 @@ class bulletRtdEnv:
             print("point: ", point)
             waypoint = waypoints[point]
             for _ in range(1):
-                k, done = self.armtd_plan(waypoint.pos, point)
-                self.step(k)
+                k, break_robot = self.armtd_plan(waypoint.pos, point)
+                self.step(k, stop=break_robot)
             if point == len(waypoints)-1:
                 while np.linalg.norm(wrap_to_pi(bernstein_q_des(self.q0[-1], self.qd0[-1], self.qdd0[-1], k, 1)) - wrap_to_pi(waypoint.pos)) > 0.2:
                     point += 1
                     print(f"goal error: {np.linalg.norm(wrap_to_pi(bernstein_q_des(self.q0[-1], self.qd0[-1], self.qdd0[-1], k, 1)) - wrap_to_pi(waypoint.pos))}")
                     # breakpoint()
-                    k, done = self.armtd_plan(waypoint.pos, point)
-                    self.step(k)
+                    k, break_robot = self.armtd_plan(waypoint.pos, point)
+                    self.step(k, stop=break_robot)
                 
-        return done
+        return
 
     def armtd_track_hardware(self, waypoint: Node):
         """
@@ -507,6 +510,14 @@ class bulletRtdEnv:
         self.EnvId.append(Id)
         self.path.append(filename)
         return Id
+    
+    def check_robot_collision(self, pos):
+        """
+        Check collision of the robot. Returns true if there is collision.
+        """
+        self.forwardkinematics(pos)
+        p.performCollisionDetection()
+        return not len(p.getContactPoints(self.robotId)) == 0
 
     def dump_video(self, filename):
         self.blender.save(filename+'.pkl')

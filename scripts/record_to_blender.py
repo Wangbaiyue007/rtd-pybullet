@@ -3,7 +3,7 @@ from bullet.bulletRtdEnv import bulletRtdEnv
 from recorder.pyBulletSimRecorder import PyBulletRecorder
 import os
 
-data = np.load("../data/trajectories/ARMOUR_1214_3.npz")
+data = np.load("../data/trajectories/ARMOUR_0120_1.npz")
 k = data['k'] #* np.array([np.pi / 72, np.pi / 72, np.pi / 72, np.pi / 72, np.pi / 72, np.pi / 72, np.pi / 72])
 q0 = data['q0'] #+ np.array([np.pi, 0, 0, 0, 0, 0, 0])
 qd0 = data['qd0']
@@ -47,7 +47,7 @@ btEnv = bulletRtdEnv(urdf_path=urdf_path, zonopyGUI=useGUI, useGravity=useGravit
 breakpoint()
 
 # find reachsets
-path_to_zono = '../assets/zonotope/ARMOUR/3/'
+path_to_zono = '../assets/zonotope/ARMOUR/1/'
 files_zono = os.listdir(path_to_zono)
 
 # initialize renderer

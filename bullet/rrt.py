@@ -63,7 +63,7 @@ class BuildRRT:
             return False
         # pos = torch.tensor(node.pos, dtype=torch.float)
         # return not self.env.zonopy.arm3d.collision_check(pos)
-        return True
+        return not self.env.check_robot_collision(node.pos)
 
     def _check_within_limits(self, node):
         # Joint limits with same lower and upper bounds have no limits

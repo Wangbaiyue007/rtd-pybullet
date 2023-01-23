@@ -12,7 +12,7 @@ end
 figure(1); view(3); axis equal; hold on; axis on;
 tspan = linspace(0, 1, 128 + 1);
 
-num_steps = 54;
+num_steps = 76;
 for i = 1:num_steps
     link_reachset_center{i} = readmatrix(append('reachsets/step_', num2str(i),'_center.txt'), 'FileType', 'text');
     link_reachset_generators{i} = readmatrix(append('reachsets/step_', num2str(i), '_radius.txt'), 'FileType', 'text');
@@ -49,7 +49,7 @@ for i = 1:size(obs_pos,2)
 end
 
 % plot link reachsets
-for step = 52
+for step = 1:num_steps
     for j = 1:8
         c = link_reachset_center{step}((tid-1)*8+j, :)';
         g = link_reachset_generators{step}( ((tid-1)*8+j-1)*3+1 : ((tid-1)*8+j)*3, :);
