@@ -77,6 +77,7 @@ class bulletRtdEnv:
         # p.loadURDF('plane.urdf')
 
         self.EnvId = []
+        self.urdf_path = urdf_path
         if useRobot:
             self.robotId = p.loadURDF(urdf_path+'/kinova_gen3_7dof/kinova_with_gripper_dumbbell.urdf', [0, 0, 0], useFixedBase=True)
             self.EnvId = [self.robotId]
@@ -107,7 +108,7 @@ class bulletRtdEnv:
         if len(obs_ori[0]) == 0:
             obs_ori = [[0, 0, 0]]*len(obs_pos)
         for i in range(len(obs_pos)):
-            self.load(urdf_path+"/objects/cube_small_zero.urdf", pos=obs_pos[i], ori=obs_ori[i], scale=obs_size[i], urdf_index=i)
+            self.load(urdf_path+"/objects/cube_small_zero.urdf", pos=obs_pos[i], ori=obs_ori[i], scale=obs_size[i]+0.08, urdf_index=i)
 
         ############################## planner #############################
         # initialize planner and its environment
@@ -207,7 +208,7 @@ class bulletRtdEnv:
 
         # build rrt tree with specified goal bias and step size
         goal_bias = 0.2
-        step_size = 0.1
+        step_size = 0.02
         rrt_builder = BuildRRT(self, start_pos, self.goal_pos, goal_bias, step_size)
         success = rrt_builder.build_tree()
         if success:
@@ -216,6 +217,12 @@ class bulletRtdEnv:
             waypoints = rrt_builder.solution
             # waypoints = waypoints[0::2]
             self.plot_waypoints(waypoints)
+            for i in range(len(self.obs_pos)):
+                self.remove_body(self.EnvId[1])
+                import os
+                os.remove(self.path[i+1])
+            for i in range(len(self.obs_pos)):
+                self.load(self.urdf_path+"/objects/cube_small_zero1.urdf", pos=self.obs_pos[i], ori=self.obs_ori[i], scale=self.obs_size[i], urdf_index=i)
             return waypoints, success
         else:
             return 0, False
@@ -433,6 +440,7 @@ class bulletRtdEnv:
         else:
             filename_new = self.scale_urdf(filename, scale, urdf_index)
             objId = p.loadURDF(filename_new)
+            filename = filename_new
         
         if saveid:
             self.EnvId.append(objId)
@@ -534,6 +542,7 @@ class bulletRtdEnv:
     def remove_body(self, bodyId):
         p.removeBody(bodyId)
         self.EnvId.remove(bodyId)
+        #TODO: remove self.path
 
     def Disconnect(self):
         p.disconnect()

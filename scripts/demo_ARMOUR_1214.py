@@ -62,7 +62,8 @@ qpos = (qpos + np.pi) % (2 * np.pi) - np.pi # wrap to pi
 
 # generate obstacles
 obs_pos_1 = np.array([[0.43014, 0.16598, 0.172]])
-obs_size_1 = np.array([[0.33, 0.33, 0.33]])
+# obs_size_1 = np.array([[0.33, 0.33, 0.33]])
+obs_size_1 = np.array([[0.24, 0.24, 0.24]])
 obs_ori_1 = [[0, 0, 0.362*2]]
 
 obs_pos_2 = np.array([[0.540638, 0.386875, 0.172]])
