@@ -62,15 +62,17 @@ qpos = (qpos + np.pi) % (2 * np.pi) - np.pi # wrap to pi
 
 # generate obstacles
 obs_pos_1 = np.array([[0.43014, 0.16598, 0.172]])
-# obs_size_1 = np.array([[0.33, 0.33, 0.33]])
-obs_size_1 = np.array([[0.24, 0.24, 0.24]])
+# obs_pos_1 = np.array([[0.6, 0.3, 0.172]])
+obs_size_1 = np.array([[0.33, 0.33, 0.33]])
 obs_ori_1 = [[0, 0, 0.362*2]]
 
 obs_pos_2 = np.array([[0.540638, 0.386875, 0.172]])
+# obs_pos_2 = np.array([[0.6, 0.3, 0.172]])
 obs_size_2 = np.array([[.36, .36, .9]])
 obs_ori_2 = [[0, 0, 0.320772*2]]
 
-obs_pos_3 = np.array([[0.899289, 0.202362, 0.172], [0.507197, 0.136198, 0.172]])
+# obs_pos_3 = np.array([[0.899289, 0.202362, 0.172], [0.507197, 0.136198, 0.172]])
+obs_pos_3 = np.array([[0.8, 0.3, 0.172], [0.6, 0.1, 0.172]])
 obs_size_3 = np.array([[0.33, 0.33, 0.33], [0.33, 0.33, 0.33]])
 obs_ori_3 = [[0, 0, -0.114447*2], [0, 0, -0.312354*2]]
 
@@ -81,11 +83,11 @@ rack_pos = np.array([[-0.3, 0., 0.5], [0.8, 0, 1], [1, -0.6, 0], [1, 0.81, 0]])
 rack_size = np.array([[0.01, 2, 2], [2, 2, 0.01], [2, 0.01, 2], [2, 0.01, 2]])
 
 q0 = qpos[0]
-for number in range(3):
+for number in [0]:
     # load waypoints
-    traj = np.load(f"../data/trajectories/traj_dumbbell{number+1}.npz")
-    _waypoints = traj['waypoints']
-    waypoints = [JointPose(waypoint) for waypoint in _waypoints]
+    # traj = np.load(f"../data/trajectories/traj_dumbbell{number+1}.npz")
+    # _waypoints = traj['waypoints']
+    # waypoints = [JointPose(waypoint) for waypoint in _waypoints]
     
     # load obstacles
     obs_pos_i = np.append(obs_pos[number], rack_pos, axis=0)
@@ -95,7 +97,8 @@ for number in range(3):
     # create env
     btEnv = bulletRtdEnv(urdf_path=urdf_path, zonopyGUI=useGUI, useGravity=useGravity, \
         useRobot=useRobot, useTorqueControl=useTorqueControl, planner=planner, record=record, blender_record=blender,\
-        q0=q0, qgoal=qpos[number+1], obs_pos=obs_pos_i, obs_size=obs_size_i, obs_ori=obs_ori_i)
+        q0=qpos[number], qgoal=qpos[number+1], obs_pos=obs_pos_i, obs_size=obs_size_i, obs_ori=obs_ori_i)
+    btEnv.rrt_buffer = 0.25
 
     # simulate tracking from q0 to qgoal
     # btEnv.plot_waypoints(waypoints)
