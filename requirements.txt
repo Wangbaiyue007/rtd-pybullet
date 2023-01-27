@@ -13,6 +13,6 @@ PyYAML==6.0
 scipy==1.9.3
 setuptools==45.2.0
 stable_baselines3==1.6.2
-torch==1.13.0
+torch==1.13.1
 transforms3d==0.4.1
 urdfpy==0.0.22
